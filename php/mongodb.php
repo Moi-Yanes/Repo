@@ -4,7 +4,7 @@
 	
 	
 	/* PHP CONFIG */
-	include 'config.php';
+	require_once 'include.php';
 	
 	/* PHPExcel */
 	set_include_path(implode(PATH_SEPARATOR, array(realpath(Config::PATH .'/phpexcel/Classes/'),get_include_path(),)));

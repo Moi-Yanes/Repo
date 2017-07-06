@@ -1,6 +1,9 @@
 <?php 
-	
-	include "mongodb.php"
+	/* PHP ERRORS */
+	ini_set('display_errors','On');
+
+	//Inclusion de ficheros php
+	require_once 'php/include.php';
 
 
 ?>
@@ -21,7 +24,7 @@
 		<?php 
 			//count_all_noticias();
 			//remove_coleccion('noticia');
-			$arr = get_noticia('587536bc01d0282ddcf2d287')/*get_all_noticias('noticia', 10)*/;
+			$arr = get_all_noticias('noticia', 10);
 			
 			if ( !empty($arr) ){
 				
