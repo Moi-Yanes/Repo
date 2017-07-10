@@ -11,7 +11,7 @@
 
 	
 
-	// Obtener listado de noticias
+	// Obtener listado de noticias a partir de un fichero excel
 	function get_noticias_excel() {
 	
 		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
@@ -47,8 +47,8 @@
 
 
 
-	// Insertar noticias en la base de datos
-	function insert_noticias_bd($noticias){ //array de noticias
+	// Insertar noticias en la base de datos a partir de un array de noticias
+	function insert_noticias_bd($noticias){
 
 		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
 		$bulk = new MongoDB\Driver\BulkWrite;
@@ -73,6 +73,54 @@
 		printf("Se han insertado %d documentos en la base de datos\n", $result->getInsertedCount());
 	}
 
+
+
+
+	//INSERTAR LOS BARRIOS DE SC DE TENERIFE EN LA BASE DE DATOS CON SUS COORDENADAS
+	function insert_coordenadas_bd(){
+		
+		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
+		$bulk = new MongoDB\Driver\BulkWrite;
+		$registros = array();
+
+		//OBTENER DATOS DE CSV
+		if (($fichero = fopen(Config::PATH."/dump/barrios.csv", "r")) !== FALSE) {
+			
+			// Lee los nombres de los campos
+			$nombres_campos = fgetcsv($fichero, 0, ",", "\"", "\"");
+			$num_campos = count($nombres_campos);
+			
+			// Lee los registros
+			while (($datos = fgetcsv($fichero, 0, ",", "\"", "\"")) !== FALSE) {
+				// Crea un array asociativo con los nombres y valores de los campos
+				for ($icampo = 0; $icampo < $num_campos; $icampo++) {
+					$registro[$nombres_campos[$icampo]] = $datos[$icampo];
+				}
+				// Añade el registro leido al array de registros
+				$registros[] = $registro;
+			}
+			fclose($fichero);
+
+
+			//GUARDAR DATOS EN LA BASE DE DATOS
+			for ($i = 0; $i < count($registros); $i++) {
+				//echo "Nombre: " . $registros[$i]["BARRIO"] . "\n";
+		
+				$doc = array(
+					'id'      	=> new MongoDB\BSON\ObjectID,     #Generate MongoID
+					'BARRIO'	=> $registros[$i]['BARRIO'],
+					'DISTRITO'	=> $registros[$i]['DISTRITO'],
+					'LATITUD'	=> $registros[$i]['GRAD_Y'],
+					'LONGITUD'	=> $registros[$i]['GRAD_X']
+				);
+				$bulk->insert($doc);	
+			}
+
+			$result = $mongo->executeBulkWrite('NoticiasDB.coordenadas', $bulk); # 'NoticiasDB' es la base de datos y 'coordenadas' la collection.  
+			printf("Se han insertado %d documentos en la base de datos\n", $result->getInsertedCount());
+		} 
+
+	}
 
 
 
@@ -196,6 +244,7 @@
 	//echo '<br>';
 	//remove_noticia('595b8133bc5cec0a8e7ebbd9', 'noticia');
 	//get_noticia('5861514401d0282764853a9e'); //Buscar noticia por id
+	//insert_coordenadas_bd();
 ?>
 
 

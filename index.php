@@ -24,9 +24,9 @@
 			}
 			/* Optional: Makes the sample page fill the window. */
 			html, body {
-			height: 100%;
-			margin: 0;
-			padding: 0;
+				height: 100%;
+				margin: 0;
+				padding: 0;
 			}
 		</style>
 	</head>
@@ -77,8 +77,8 @@
 			var map;
 			function initMap() {
 				map = new google.maps.Map(document.getElementById('map'), {
-				  center: {lat: -34.397, lng: 150.644},
-				  zoom: 8
+				  center: {lat: 28.5534710818/*28.463938*/, lng: -16.141977772/*-16.262598*/}, //(Y,X)
+				  zoom: 15
 				});
 			}
 		</script>
