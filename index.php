@@ -5,7 +5,6 @@
 	//Inclusion de ficheros php
 	require_once 'php/include.php';
 
-
 ?>
 
 <!DOCTYPE html>
@@ -73,16 +72,11 @@
 	
 		<div id="map"></div>
 		
-		<script>
-			var map;
-			function initMap() {
-				map = new google.maps.Map(document.getElementById('map'), {
-				  center: {lat: 28.5534710818/*28.463938*/, lng: -16.141977772/*-16.262598*/}, //(Y,X)
-				  zoom: 15
-				});
-			}
-		</script>
+
+
+
 
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBK16iT0lz1tODBvJqToq_ret28wpSPTk&callback=initMap" async defer></script>
+		<script src="<?php echo SERVER_PATH; ?>js/index.js"></script>
 	</body>
 </html>

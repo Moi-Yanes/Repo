@@ -6,11 +6,231 @@
 	/* PHP CONFIG */
 	require_once 'include.php';
 	
+
 	/* PHPExcel */
 	set_include_path(implode(PATH_SEPARATOR, array(realpath(Config::PATH .'/phpexcel/Classes/'),get_include_path(),)));
 
+
+
+
+
+	// Calcular la ubicacion de la noticia e insertar en la base de datos
+	function insert_ubicacion(){
+
+
+		//comprobar si el campo ubicacion existe en la bbdd sino crearlo
+
+		//obtener las ubicaciones y guardarlas en ese campo
+	}
+
+
+
+
+	// Obtener info de una noticia en concreto	
+	function get_noticia($id){
+		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
+
+		$filter['_id']=new MongoDB\BSON\ObjectID($id); 
+		$query = new MongoDB\Driver\Query($filter);
+		
+		$rows = $mongo->executeQuery('NoticiasDB.noticia', $query); // $mongo contains the connection object to MongoDB
+		$fila = $rows->toArray();
+
+		if ( !empty($fila) ){
+			foreach($fila as $r){
+				$arr[] = array(
+					'RSS'		=> $r->rss,
+					'PERIODICO'	=> $r->periodico,
+					'TITULAR'	=> $r->titular,
+					'DESCRIPCION'	=> $r->descripcion,
+					'LINK'		=> $r->link,
+					'FECHA'		=> (new MongoDB\BSON\UTCDateTime((string)$r->fecha))->toDateTime()->format('d-m-Y')
+				);
+			}
+			return $arr;
+		}
+		else{
+			echo "No existe la noticia indicada".'<br>';
+		}
+	}
+
+
+
+
+	// Obtener info de todas las noticias de una coleccion
+	function get_all_noticias($coleccion, $limit=0){
+		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
+		$query = new MongoDB\Driver\Query([], ['limit' => $limit]);
+		
+		$rows = $mongo->executeQuery('NoticiasDB.'.$coleccion, $query); // $mongo contains the connection object to MongoDB
+		$fila = $rows->toArray();
+		$fecha = date_create();
+
+		if ( !empty($fila) ){
+			foreach($fila as $r){
+
+				$arr[] = array(
+					'_id'		=> $r->_id,
+					'RSS'		=> $r->rss,
+					'PERIODICO'	=> $r->periodico,
+					'TITULAR'	=> $r->titular,
+					'DESCRIPCION'	=> $r->descripcion,
+					'LINK'		=> $r->link,
+					'FECHA'		=> (new MongoDB\BSON\UTCDateTime((string)$r->fecha))->toDateTime()->format('d-m-Y')
+				);	
+			}
+			return $arr;
+		}
+		else{
+			echo "No existe la noticia indicada".'<br>';
+		}
+	}
+
+
+
+
+	// Contar todas las noticias de la base de datos en la coleccion noticia
+	function count_all_noticias(){
+		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
+		$query = new MongoDB\Driver\Query([]);
+		
+		$rows = $mongo->executeQuery('NoticiasDB.noticia', $query); // $mongo contains the connection object to MongoDB
+		$fila = $rows->toArray();
+	
+		echo "La base de datos 'NoticiasDB' cuenta con: ".count($fila)." documentos en la coleccion 'noticia'";
+	}
+
+
 	
 
+	//Eliminar todos los documentos de una coleccion
+	function remove_coleccion($coleccion){
+			
+		$mongo 	= new MongoDB\Driver\Manager(Config::MONGODB);
+		$bulk 	= new MongoDB\Driver\BulkWrite;
+		
+		$bulk->delete([]);
+		$result = $mongo->executeBulkWrite('NoticiasDB.'.$coleccion, $bulk);
+		printf("Se han eliminado %d documentos en la base de datos\n", $result->getDeletedCount());
+	}
+
+
+
+
+	//Eliminar un documento en concreto de una coleccion /Eliminar una noticia de la tabla noticia
+	function remove_noticia($id, $coleccion){
+		
+		$mongo 	= new MongoDB\Driver\Manager(Config::MONGODB);
+		$bulk 	= new MongoDB\Driver\BulkWrite;
+		$id 	= new MongoDB\BSON\ObjectID($id);
+
+
+		$bulk->delete(['_id' => $id]);
+		$result = $mongo->executeBulkWrite('NoticiasDB.'.$coleccion, $bulk);
+		printf("Se han eliminado %d documentos en la base de datos\n", $result->getDeletedCount());
+	}
+	
+
+
+
+	//LEER E INSERTAR LOS BARRIOS DE SC DE TENERIFE EN LA BASE DE DATOS CON SUS COORDENADAS
+	function insert_coordenadas_bd(){
+		
+		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
+		$bulk = new MongoDB\Driver\BulkWrite;
+		$registros = array();
+
+		//OBTENER DATOS DE CSV
+		if (($fichero = fopen(Config::PATH."/dump/barrios.csv", "r")) !== FALSE) {
+			
+			// Lee los nombres de los campos
+			$nombres_campos = fgetcsv($fichero, 0, ",", "\"", "\"");
+			$num_campos = count($nombres_campos);
+			
+			// Lee los registros
+			while (($datos = fgetcsv($fichero, 0, ",", "\"", "\"")) !== FALSE) {
+				// Crea un array asociativo con los nombres y valores de los campos
+				for ($icampo = 0; $icampo < $num_campos; $icampo++) {
+					$registro[$nombres_campos[$icampo]] = $datos[$icampo];
+				}
+				// Añade el registro leido al array de registros
+				$registros[] = $registro;
+			}
+			fclose($fichero);
+
+
+			//GUARDAR DATOS EN LA BASE DE DATOS
+			for ($i = 0; $i < count($registros); $i++) {
+				//echo "Nombre: " . $registros[$i]["BARRIO"] . "\n";
+		
+				$doc = array(
+					'id'      	=> new MongoDB\BSON\ObjectID,     #Generate MongoID
+					'BARRIO'	=> $registros[$i]['BARRIO'],
+					'DISTRITO'	=> $registros[$i]['DISTRITO'],
+					'LATITUD'	=> $registros[$i]['GRAD_Y'],
+					'LONGITUD'	=> $registros[$i]['GRAD_X']
+				);
+				$bulk->insert($doc);	
+			}
+
+			$result = $mongo->executeBulkWrite('NoticiasDB.coordenadas', $bulk); # 'NoticiasDB' es la base de datos y 'coordenadas' la collection.  
+			printf("Se han insertado %d documentos en la base de datos\n", $result->getInsertedCount());
+		} 
+
+	}
+
+	
+
+
+	function create_json_marcadores(){
+		
+		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
+		$query = new MongoDB\Driver\Query([]);
+		
+		$rows = $mongo->executeQuery('NoticiasDB.coordenadas', $query); // $mongo contains the connection object to MongoDB
+		$fila = $rows->toArray();
+		
+		//Leer filas resultantes de la consulta
+		if ( !empty($fila) ){
+			foreach($fila as $r){
+
+				//Guardar en un array los resultados
+				$arr[] = array(
+					'_id'		=> $r->id,
+					'BARRIO'	=> $r->BARRIO,
+					'DISTRITO'	=> $r->DISTRITO,
+					'LATITUD'	=> $r->LATITUD,
+					'LONGITUD'	=> $r->LONGITUD
+				);	
+			}
+
+			
+			//Crear json con barrios y coordenadas
+			$nombre_archivo = Config::PATH.'/dump/coordenadas.json'; 
+ 
+			if(!file_exists($nombre_archivo)){
+				
+				$fp = fopen($nombre_archivo,"w+");
+				fwrite($fp, json_encode($arr));
+				fclose($fp);	
+			}else{
+				
+				$fp = fopen($nombre_archivo,"a+");
+				fwrite($fp, json_encode($arr));
+				fclose($fp);
+			}
+			
+		}
+		else{
+			echo "No existen noticias";
+		}
+
+	}
+
+
+
+
+	//EXCEL
 	// Obtener listado de noticias a partir de un fichero excel
 	function get_noticias_excel() {
 	
@@ -74,165 +294,6 @@
 	}
 
 
-
-
-	//INSERTAR LOS BARRIOS DE SC DE TENERIFE EN LA BASE DE DATOS CON SUS COORDENADAS
-	function insert_coordenadas_bd(){
-		
-		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
-		$bulk = new MongoDB\Driver\BulkWrite;
-		$registros = array();
-
-		//OBTENER DATOS DE CSV
-		if (($fichero = fopen(Config::PATH."/dump/barrios.csv", "r")) !== FALSE) {
-			
-			// Lee los nombres de los campos
-			$nombres_campos = fgetcsv($fichero, 0, ",", "\"", "\"");
-			$num_campos = count($nombres_campos);
-			
-			// Lee los registros
-			while (($datos = fgetcsv($fichero, 0, ",", "\"", "\"")) !== FALSE) {
-				// Crea un array asociativo con los nombres y valores de los campos
-				for ($icampo = 0; $icampo < $num_campos; $icampo++) {
-					$registro[$nombres_campos[$icampo]] = $datos[$icampo];
-				}
-				// Añade el registro leido al array de registros
-				$registros[] = $registro;
-			}
-			fclose($fichero);
-
-
-			//GUARDAR DATOS EN LA BASE DE DATOS
-			for ($i = 0; $i < count($registros); $i++) {
-				//echo "Nombre: " . $registros[$i]["BARRIO"] . "\n";
-		
-				$doc = array(
-					'id'      	=> new MongoDB\BSON\ObjectID,     #Generate MongoID
-					'BARRIO'	=> $registros[$i]['BARRIO'],
-					'DISTRITO'	=> $registros[$i]['DISTRITO'],
-					'LATITUD'	=> $registros[$i]['GRAD_Y'],
-					'LONGITUD'	=> $registros[$i]['GRAD_X']
-				);
-				$bulk->insert($doc);	
-			}
-
-			$result = $mongo->executeBulkWrite('NoticiasDB.coordenadas', $bulk); # 'NoticiasDB' es la base de datos y 'coordenadas' la collection.  
-			printf("Se han insertado %d documentos en la base de datos\n", $result->getInsertedCount());
-		} 
-
-	}
-
-
-
-
-	// Obtener la ubicacion de la noticia
-	function get_ubicacion(){
-
-	}
-
-
-
-
-	// Obtener info de una noticia en concreto	
-	function get_noticia($id){
-		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
-
-		$filter['_id']=new MongoDB\BSON\ObjectID($id); 
-		$query = new MongoDB\Driver\Query($filter);
-		
-		$rows = $mongo->executeQuery('NoticiasDB.noticia', $query); // $mongo contains the connection object to MongoDB
-		$fila = $rows->toArray();
-
-		if ( !empty($fila) ){
-			foreach($fila as $r){
-				$arr[] = array(
-					'RSS'		=> $r->rss,
-					'PERIODICO'	=> $r->periodico,
-					'TITULAR'	=> $r->titular,
-					'DESCRIPCION'	=> $r->descripcion,
-					'LINK'		=> $r->link,
-					'FECHA'		=> (new MongoDB\BSON\UTCDateTime((string)$r->fecha))->toDateTime()->format('d-m-Y')
-				);
-			}
-			return $arr;
-		}
-		else{
-			echo "No existe la noticia indicada".'<br>';
-		}
-	}
-
-
-	// Obtener info de todas las noticias de una coleccion
-	function get_all_noticias($coleccion, $limit=0){
-		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
-		$query = new MongoDB\Driver\Query([], ['limit' => $limit]);
-		
-		$rows = $mongo->executeQuery('NoticiasDB.'.$coleccion, $query); // $mongo contains the connection object to MongoDB
-		$fila = $rows->toArray();
-		$fecha = date_create();
-
-		if ( !empty($fila) ){
-			foreach($fila as $r){
-
-				$arr[] = array(
-					'_id'		=> $r->_id,
-					'RSS'		=> $r->rss,
-					'PERIODICO'	=> $r->periodico,
-					'TITULAR'	=> $r->titular,
-					'DESCRIPCION'	=> $r->descripcion,
-					'LINK'		=> $r->link,
-					'FECHA'		=> (new MongoDB\BSON\UTCDateTime((string)$r->fecha))->toDateTime()->format('d-m-Y')
-				);	
-			}
-			return $arr;
-		}
-		else{
-			echo "No existe la noticia indicada".'<br>';
-		}
-	}
-
-
-
-	// Contar todas las noticias de la base de datos en la coleccion noticia
-	function count_all_noticias(){
-		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
-		$query = new MongoDB\Driver\Query([]);
-		
-		$rows = $mongo->executeQuery('NoticiasDB.noticia', $query); // $mongo contains the connection object to MongoDB
-		$fila = $rows->toArray();
-	
-		echo "La base de datos 'NoticiasDB' cuenta con: ".count($fila)." documentos en la coleccion 'noticia'";
-	}
-
-	
-
-	//Eliminar todos los documentos de una coleccion
-	function remove_coleccion($coleccion){
-			
-		$mongo 	= new MongoDB\Driver\Manager(Config::MONGODB);
-		$bulk 	= new MongoDB\Driver\BulkWrite;
-		
-		$bulk->delete([]);
-		$result = $mongo->executeBulkWrite('NoticiasDB.'.$coleccion, $bulk);
-		printf("Se han eliminado %d documentos en la base de datos\n", $result->getDeletedCount());
-	}
-
-
-
-	//Eliminar un documento en concreto de una coleccion /Eliminar una noticia de la tabla noticia
-	function remove_noticia($id, $coleccion){
-		
-		$mongo 	= new MongoDB\Driver\Manager(Config::MONGODB);
-		$bulk 	= new MongoDB\Driver\BulkWrite;
-		$id 	= new MongoDB\BSON\ObjectID($id);
-
-
-		$bulk->delete(['_id' => $id]);
-		$result = $mongo->executeBulkWrite('NoticiasDB.'.$coleccion, $bulk);
-		printf("Se han eliminado %d documentos en la base de datos\n", $result->getDeletedCount());
-	}
-	
-
 	// Pruebas 
 	//$arr = get_noticias_excel(); //leer excel de noticas
 	//echo count($arr);	
@@ -245,6 +306,7 @@
 	//remove_noticia('595b8133bc5cec0a8e7ebbd9', 'noticia');
 	//get_noticia('5861514401d0282764853a9e'); //Buscar noticia por id
 	//insert_coordenadas_bd();
+	create_json_marcadores();
 ?>
 
 
