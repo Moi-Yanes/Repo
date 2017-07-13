@@ -11,8 +11,33 @@
 	set_include_path(implode(PATH_SEPARATOR, array(realpath(Config::PATH .'/phpexcel/Classes/'),get_include_path(),)));
 
 
+	//
+	function delete_caracteres($texto/*, $array*/){
+		echo $texto.'<br>'.'<br>';//
+		$nueva_cadena = preg_replace("([^A-Za-z[:space:]áéíóúÁÉÍÓÚñ])", " ", $texto); //Quita cualquier caracter menos las letras y los espacios
+		echo $nueva_cadena;
 
+		/*preg_match_all("/\slas\s|\slos\s|\sla\s|\sle\s|\sli\s|\slo\s|\slu\s|\sel\s|\sla\s|\slo\s|\sde\s|\spara\s|\spor\s/i", $nueva_cadena, $coincidencias);
+		foreach($coincidencias as $r){
+			foreach($r as $n){ echo '<br>'.$n; }
+		}*/
+		
+		/*if (preg_match('/[^\w]/', $texto, $coincidencias)){ //quitar palabras indeseadas y guardas en el array coincidencias
 
+			//resto al array original las palabras que coincidan con la expresion regular
+			//$resultado = array_diff($array, $coincidencias);
+			foreach($coincidencias as $r){			
+				echo $r.'<br>';
+			}
+			//return $resultado;
+
+		} /*else{
+			return $array;
+		}*/
+
+	}
+
+	delete_caracteres('|@@#~~½½¬¬{{[]}]\~ 123 []}{{}-.;," El Cabildo comenzó este lunes la rehabilitación del firme en varios tramos de la TF-4 (vía de penetración sur a Santa Cruz). Los trabajos, que se prolongarán durante cinco días, se desarrollarán en horario nocturno (de 22:00 a 06:00 horas) ya que se trata de una vía con una intensidad cercana a los 30.000 vehículos diarios.');
 
 	// Calcular la ubicacion de la noticia e insertar en la base de datos
 	function insert_ubicacion(){
@@ -20,7 +45,56 @@
 
 		//comprobar si el campo ubicacion existe en la bbdd sino crearlo
 
-		//obtener las ubicaciones y guardarlas en ese campo
+		//OBTENER LAS UBICACIONES Y GUARDARLAS EN ESE CAMPO
+		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
+		$query = new MongoDB\Driver\Query([]);
+		
+		//Obtener barrios
+		$rows = $mongo->executeQuery('NoticiasDB.coordenadas', $query); 
+		$barrios = $rows->toArray();
+		$arr[] = array();/*array para guardar los barrios*/
+
+		//Obtener noticias
+		$result = $mongo->executeQuery('NoticiasDB.noticia', $query); 
+		$noticias = $result->toArray();
+
+
+		if ( !empty($barrios) ){
+			
+			//Guardar en un array unicamente los nombres de los barrios
+			foreach($barrios as $r){
+				array_push($arr, $r->BARRIO);	
+			}
+
+			//Recorrer cada una de las noticas
+			if ( !empty($noticias) ){
+				foreach($noticias as $n){
+
+					//Separar las palabras del titulo y descripcion por espacios y los almacena como arrays
+					$titulo = explode(" ", $n->titular);
+					$textos = explode(" ", $n->descripcion);
+
+
+					//Eliminar caracteres innecesarios en las comparaciones
+					$titulo = delete_caracteres($n->titular,$titulo);
+					$textos = delete_caracteres($n->descripcion, $textos);
+
+					//buscar en el titulo alguna coincidencia con los barrios
+										
+
+
+					//Guardar ubicacion en la bbdd					
+
+				}
+			}else{
+				echo "No existe la noticia!";			
+			}
+		}
+		else{
+			echo "No existe la noticia indicada".'<br>';
+		}
+
+
 	}
 
 
