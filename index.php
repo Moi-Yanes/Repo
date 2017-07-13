@@ -18,8 +18,8 @@
 			/* Always set the map height explicitly to define the size of the div
 			* element that contains the map. */
 			#map {
-				height: 500px;
-				width: 500px;
+				height: 1500px;
+				width: 1500px;
 			}
 			/* Optional: Makes the sample page fill the window. */
 			html, body {
@@ -75,7 +75,7 @@
 
 
 
-
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBK16iT0lz1tODBvJqToq_ret28wpSPTk&callback=initMap" async defer></script>
 		<script src="<?php echo SERVER_PATH; ?>js/index.js"></script>
 	</body>

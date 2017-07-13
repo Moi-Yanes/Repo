@@ -181,7 +181,7 @@
 
 	
 
-
+	//CREAR FICHERO JSON SI AUN NO HA SIDO CREADO CON LA UBICACION y COORDENADAS DE CADA NOTICIA
 	function create_json_marcadores(){
 		
 		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
@@ -306,7 +306,7 @@
 	//remove_noticia('595b8133bc5cec0a8e7ebbd9', 'noticia');
 	//get_noticia('5861514401d0282764853a9e'); //Buscar noticia por id
 	//insert_coordenadas_bd();
-	create_json_marcadores();
+	
 ?>
 
 
