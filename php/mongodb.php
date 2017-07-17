@@ -11,51 +11,46 @@
 	set_include_path(implode(PATH_SEPARATOR, array(realpath(Config::PATH .'/phpexcel/Classes/'),get_include_path(),)));
 
 
-	//
-	function delete_caracteres($texto/*, $array*/){
-		echo $texto.'<br>'.'<br>';//
-		$nueva_cadena = preg_replace("([^A-Za-z[:space:]áéíóúÁÉÍÓÚñ])", " ", $texto); //Quita cualquier caracter menos las letras y los espacios
-		echo $nueva_cadena;
 
-		/*preg_match_all("/\slas\s|\slos\s|\sla\s|\sle\s|\sli\s|\slo\s|\slu\s|\sel\s|\sla\s|\slo\s|\sde\s|\spara\s|\spor\s/i", $nueva_cadena, $coincidencias);
-		foreach($coincidencias as $r){
-			foreach($r as $n){ echo '<br>'.$n; }
-		}*/
+	//Eliminar caracteres que no son necesarios analizar para buscar la ubicacion de la noticia, quedandonos con las palabras con mas probabilidad de ser la ubicacion
+	function delete_caracteres_sobrantes($texto){
+		//echo $texto.'<br>'.'<br>';//
 		
-		/*if (preg_match('/[^\w]/', $texto, $coincidencias)){ //quitar palabras indeseadas y guardas en el array coincidencias
-
-			//resto al array original las palabras que coincidan con la expresion regular
-			//$resultado = array_diff($array, $coincidencias);
-			foreach($coincidencias as $r){			
-				echo $r.'<br>';
+		$n_c = preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñ.-])/", " ", $texto); 				//Quedarse con letras(incluidas vocales con/sin acentos), espacios, guiones y puntos
+		preg_match_all("/([A-Z]{1}[A-Za-z0-9]+)((\s|\-|)(([0-9])|([A-Z]{1}[A-Za-z0-9]+)))*/", $n_c, $coinciden);//Quedarse solo con los nombres que empiecen por mayuscula compuestos o no
+		
+		$arr=array();
+		foreach($coinciden as $r){
+			foreach($r as $n){
+				array_push($arr,strtoupper($n));//Meter en un array los resultados obtenidos despues de haber filtrado el texto mediante las expresiones regulares
 			}
-			//return $resultado;
-
-		} /*else{
-			return $array;
-		}*/
-
+			break;	// Para quedarnos solo con los valores del primer subarray de coincidencias que son aquellos que cumplen completamente con la expresion regular dada
+				// el resto de subarrays devueltos solo la cumplen parcialmente
+		}
+		
+		return $arr;
 	}
 
-	delete_caracteres('|@@#~~½½¬¬{{[]}]\~ 123 []}{{}-.;," El Cabildo comenzó este lunes la rehabilitación del firme en varios tramos de la TF-4 (vía de penetración sur a Santa Cruz). Los trabajos, que se prolongarán durante cinco días, se desarrollarán en horario nocturno (de 22:00 a 06:00 horas) ya que se trata de una vía con una intensidad cercana a los 30.000 vehículos diarios.');
+
 
 	// Calcular la ubicacion de la noticia e insertar en la base de datos
 	function insert_ubicacion(){
 
 
-		//comprobar si el campo ubicacion existe en la bbdd sino crearlo
+	    //COMPROBAR SI EL CAMPO UBICACION EXISTE EN LA BBDD SINO CREARLO
 
-		//OBTENER LAS UBICACIONES Y GUARDARLAS EN ESE CAMPO
-		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
-		$query = new MongoDB\Driver\Query([]);
+	    //OBTENER LAS UBICACIONES Y GUARDARLAS EN ESE CAMPO
+		$mongo    = new MongoDB\Driver\Manager(Config::MONGODB);
+		$query    = new MongoDB\Driver\Query([]);
+		$bulk = new MongoDB\Driver\BulkWrite;
 		
 		//Obtener barrios
-		$rows = $mongo->executeQuery('NoticiasDB.coordenadas', $query); 
-		$barrios = $rows->toArray();
-		$arr[] = array();/*array para guardar los barrios*/
+		$rows 	  = $mongo->executeQuery('NoticiasDB.coordenadas', $query); 
+		$barrios  = $rows->toArray();
+		$barr 	  = array();/*array para guardar los barrios*/
 
 		//Obtener noticias
-		$result = $mongo->executeQuery('NoticiasDB.noticia', $query); 
+		$result   = $mongo->executeQuery('NoticiasDB.noticia', $query); 
 		$noticias = $result->toArray();
 
 
@@ -63,29 +58,66 @@
 			
 			//Guardar en un array unicamente los nombres de los barrios
 			foreach($barrios as $r){
-				array_push($arr, $r->BARRIO);	
+				array_push($barr, $r->BARRIO);	
 			}
 
 			//Recorrer cada una de las noticas
 			if ( !empty($noticias) ){
 				foreach($noticias as $n){
-
-					//Separar las palabras del titulo y descripcion por espacios y los almacena como arrays
+					$encontrado = false;
+					$ubicacion = "";
+					/*Separar las palabras del titulo y descripcion por espacios y los almacena como arrays
 					$titulo = explode(" ", $n->titular);
-					$textos = explode(" ", $n->descripcion);
+					$textos = explode(" ", $n->descripcion);*/
 
 
 					//Eliminar caracteres innecesarios en las comparaciones
-					$titulo = delete_caracteres($n->titular,$titulo);
-					$textos = delete_caracteres($n->descripcion, $textos);
+					$titulo      = delete_caracteres_sobrantes($n->titular);
+					$descripcion = delete_caracteres_sobrantes($n->descripcion);
+
 
 					//buscar en el titulo alguna coincidencia con los barrios
-										
+					if($encontrado == false){
+						foreach($titulo as $t){							 
+							if (in_array($t, $barr)) { //todo en mayuscula
+								$ubicacion = $t;
+								$encontrado = true;
+								break;
+							}	
+						}
+					}
+
+					//buscar en la descripcion alguna coincidencia
+					if($encontrado == false){
+						foreach($descripcion as $d){
+							if (in_array($d, $barr)) { //todo en mayuscula
+								$ubicacion = $d;
+								$encontrado = true;
+								break;
+							}	
+						}
+					}					
 
 
-					//Guardar ubicacion en la bbdd					
-
+					//Guardar ubicacion en la bbdd	
+					if($encontrado == true){
+						$bulk->update(
+						    ['_id' => new MongoDB\BSON\ObjectID($n->_id)],
+						    ['$set' => ['ubicacion' => $ubicacion]],
+						    ['multi' => false, 'upsert' => false]
+						);	
+					}
+					elseif($encontrado == false){
+						$bulk->update(
+						    ['_id' => new MongoDB\BSON\ObjectID($n->_id)],
+						    ['$set' => ['ubicacion' => "No encontrada"]],
+						    ['multi' => false, 'upsert' => false]
+						);
+					}
+					echo "La ubicacion es: ".$ubicacion.'<br>';
 				}
+				$mongo->executeBulkWrite('NoticiasDB.noticia', $bulk); //Actualizar el campo ubicacion de la coleccion de noticias de la base de datos
+	
 			}else{
 				echo "No existe la noticia!";			
 			}
@@ -93,11 +125,7 @@
 		else{
 			echo "No existe la noticia indicada".'<br>';
 		}
-
-
 	}
-
-
 
 
 	// Obtener info de una noticia en concreto	
