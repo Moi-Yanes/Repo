@@ -11,18 +11,48 @@
 	set_include_path(implode(PATH_SEPARATOR, array(realpath(Config::PATH .'/phpexcel/Classes/'),get_include_path(),)));
 
 
+	//Eliminar lso acentos de las palabras claves obtenidas para poder compararlos correctamente con los almacenados en la base de datos(no tienen tilde)
+	function quitar_tildes($cadena) {
+		$no_permitidas= array ( "á","é","í","ó","ú","Á",
+				      	"É","Í","Ó","Ú","ñ","À",
+					"Ã","Ì","Ò","Ù","Ã™","Ã ",
+					"Ã¨","Ã¬","Ã²","Ã¹","ç",
+					"Ç","Ã¢","ê","Ã®","Ã´","Ã»",
+					"Ã‚","ÃŠ","ÃŽ","Ã”","Ã›","ü",
+				       	"Ã¶","Ã–","Ã¯","Ã¤","«",
+				       	"Ò","Ã","Ã„","Ã‹");
+		
+		$permitidas= array("a","e","i","o","u",
+				   "A","E","I","O","U",
+				   "n","N","A","E","I",
+				   "O","U","a","e","i",
+				   "o","u","c","C","a",
+				   "e","i","o","u","A",
+				   "E","I","O","U","u",
+				   "o","O","i","a","e",
+				   "U","I","A","E");
+
+		$texto = str_replace($no_permitidas, $permitidas ,$cadena);
+		return $texto;
+	}
+
+
 
 	//Eliminar caracteres que no son necesarios analizar para buscar la ubicacion de la noticia, quedandonos con las palabras con mas probabilidad de ser la ubicacion
 	function delete_caracteres_sobrantes($texto){
-		//echo $texto.'<br>'.'<br>';//
 		
-		$n_c = preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñ.-])/", " ", $texto); 				//Quedarse con letras(incluidas vocales con/sin acentos), espacios, guiones y puntos
-		preg_match_all("/([A-Z]{1}[A-Za-z0-9]+)((\s|\-|)(([0-9])|([A-Z]{1}[A-Za-z0-9]+)))*/", $n_c, $coinciden);//Quedarse solo con los nombres que empiecen por mayuscula compuestos o no
+		/*
+			1. //Quedarse con letras(incluidas vocales con/sin acentos), espacios, guiones y puntos
+			2. //Quedarse solo con los nombres que empiecen por mayuscula compuestos o no
+		*/
+		$n_c = preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñ.-])/", " ", $texto);				
+		preg_match_all("/([A-ZÁÉÍÓÚ]{1}[A-Za-z0-9áéíóúÁÉÍÓÚ]+)((\s|\-|)(([0-9])|([A-ZÁÉÍÓÚ]{1}[A-Za-z0-9áéíóúÁÉÍÓÚ]+)))*/", $n_c, $coinciden);
 		
 		$arr=array();
-		foreach($coinciden as $r){
-			foreach($r as $n){
-				array_push($arr,strtoupper($n));//Meter en un array los resultados obtenidos despues de haber filtrado el texto mediante las expresiones regulares
+		foreach($coinciden as $r){ 
+			foreach($r as $n){ 
+				$n = quitar_tildes($n); 				
+				array_push($arr,strtoupper($n));//Meter en un array los resultados obtenidos despues de haber filtrado el texto mediante las expresiones regulares	       
 			}
 			break;	// Para quedarnos solo con los valores del primer subarray de coincidencias que son aquellos que cumplen completamente con la expresion regular dada
 				// el resto de subarrays devueltos solo la cumplen parcialmente
@@ -30,7 +60,6 @@
 		
 		return $arr;
 	}
-
 
 
 	// Calcular la ubicacion de la noticia e insertar en la base de datos
@@ -42,7 +71,7 @@
 	    //OBTENER LAS UBICACIONES Y GUARDARLAS EN ESE CAMPO
 		$mongo    = new MongoDB\Driver\Manager(Config::MONGODB);
 		$query    = new MongoDB\Driver\Query([]);
-		$bulk = new MongoDB\Driver\BulkWrite;
+		$bulk 	  = new MongoDB\Driver\BulkWrite;
 		
 		//Obtener barrios
 		$rows 	  = $mongo->executeQuery('NoticiasDB.coordenadas', $query); 
@@ -78,23 +107,51 @@
 
 					//buscar en el titulo alguna coincidencia con los barrios
 					if($encontrado == false){
-						foreach($titulo as $t){							 
-							if (in_array($t, $barr)) { //todo en mayuscula
+						foreach($titulo as $t){		  //Decir Gregoria Alonso Jiménez no supone nada especial. Ni siquiera en Afur.						 
+							if (in_array($t, $barr)) { //Comparacion de palabra exacta (en mayuscula)
 								$ubicacion = $t;
 								$encontrado = true;
 								break;
-							}	
+							}
+							if($encontrado == false){ //Comparacion parcial (en mayuscula)
+								foreach($barr as $p){	
+									if(preg_match("/\s".$t."\s/",$p)){
+										if($t!='DE' && $t!='EL' && $t!='LA' && $t!='DEL' && $t!='LAS' && $t!='LOS'){
+											echo "Desc: ".$t."  barrio: ".$p.'<br>';
+									    		$ubicacion = $t;
+											$encontrado = true;
+											break;	
+										}							
+									}							
+								}
+							}
+							if($encontrado==true)
+								break;	
 						}
 					}
 
 					//buscar en la descripcion alguna coincidencia
 					if($encontrado == false){
-						foreach($descripcion as $d){
-							if (in_array($d, $barr)) { //todo en mayuscula
+						foreach($descripcion as $d){	
+							if (in_array($d, $barr)) { //Comparacion de palabra exacta (en mayuscula)
 								$ubicacion = $d;
 								$encontrado = true;
 								break;
-							}	
+							}
+							if($encontrado == false){ //Comparacion parcial (en mayuscula)
+								foreach($barr as $p){	
+									if(preg_match("/\s".$d."\s/",$p)){
+										if($d!='DE' && $d!='EL' && $d!='LA' && $d!='DEL' && $d!='LAS' && $d!='LOS'){
+											echo "Desc: ".$d."  barrio: ".$p.'<br>';
+									    		$ubicacion = $d;
+											$encontrado = true;
+											break;	
+										}							
+									}							
+								}
+							}
+							if($encontrado==true)
+								break;	
 						}
 					}					
 
@@ -126,6 +183,8 @@
 			echo "No existe la noticia indicada".'<br>';
 		}
 	}
+
+	insert_ubicacion();
 
 
 	// Obtener info de una noticia en concreto	
