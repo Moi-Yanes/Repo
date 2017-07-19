@@ -13,8 +13,9 @@
 
 	//Eliminar lso acentos de las palabras claves obtenidas para poder compararlos correctamente con los almacenados en la base de datos(no tienen tilde)
 	function quitar_tildes($cadena) {
-		$no_permitidas= array ( "á","é","í","ó","ú","Á",
-				      	"É","Í","Ó","Ú","ñ","À",
+		$no_permitidas= array ( "á","é","í","ó","ú",
+					"à","è","ì","ò","ù",
+				      	"Á","É","Í","Ó","Ú","ñ","À",
 					"Ã","Ì","Ò","Ù","Ã™","Ã ",
 					"Ã¨","Ã¬","Ã²","Ã¹","ç",
 					"Ç","Ã¢","ê","Ã®","Ã´","Ã»",
@@ -23,6 +24,7 @@
 				       	"Ò","Ã","Ã„","Ã‹");
 		
 		$permitidas= array("a","e","i","o","u",
+				   "a","e","i","o","u",
 				   "A","E","I","O","U",
 				   "n","N","A","E","I",
 				   "O","U","a","e","i",
@@ -65,7 +67,7 @@
 	// Calcular la ubicacion de la noticia e insertar en la base de datos
 	function insert_ubicacion(){
 
-
+	
 	    //COMPROBAR SI EL CAMPO UBICACION EXISTE EN LA BBDD SINO CREARLO
 
 	    //OBTENER LAS UBICACIONES Y GUARDARLAS EN ESE CAMPO
@@ -87,7 +89,7 @@
 			
 			//Guardar en un array unicamente los nombres de los barrios
 			foreach($barrios as $r){
-				array_push($barr, $r->BARRIO);	
+				array_push($barr, $r->LUGAR);	
 			}
 
 			//Recorrer cada una de las noticas
@@ -95,9 +97,6 @@
 				foreach($noticias as $n){
 					$encontrado = false;
 					$ubicacion = "";
-					/*Separar las palabras del titulo y descripcion por espacios y los almacena como arrays
-					$titulo = explode(" ", $n->titular);
-					$textos = explode(" ", $n->descripcion);*/
 
 
 					//Eliminar caracteres innecesarios en las comparaciones
@@ -113,18 +112,18 @@
 								$encontrado = true;
 								break;
 							}
-							if($encontrado == false){ //Comparacion parcial (en mayuscula)
+							/*if($encontrado == false){ //Comparacion parcial (en mayuscula)
 								foreach($barr as $p){	
 									if(preg_match("/\s".$t."\s/",$p)){
 										if($t!='DE' && $t!='EL' && $t!='LA' && $t!='DEL' && $t!='LAS' && $t!='LOS'){
-											echo "Desc: ".$t."  barrio: ".$p.'<br>';
+											
 									    		$ubicacion = $t;
 											$encontrado = true;
 											break;	
 										}							
 									}							
 								}
-							}
+							}*/
 							if($encontrado==true)
 								break;	
 						}
@@ -138,18 +137,18 @@
 								$encontrado = true;
 								break;
 							}
-							if($encontrado == false){ //Comparacion parcial (en mayuscula)
+							/*if($encontrado == false){ //Comparacion parcial (en mayuscula)
 								foreach($barr as $p){	
 									if(preg_match("/\s".$d."\s/",$p)){
 										if($d!='DE' && $d!='EL' && $d!='LA' && $d!='DEL' && $d!='LAS' && $d!='LOS'){
-											echo "Desc: ".$d."  barrio: ".$p.'<br>';
+											
 									    		$ubicacion = $d;
 											$encontrado = true;
 											break;	
 										}							
 									}							
 								}
-							}
+							}*/
 							if($encontrado==true)
 								break;	
 						}
@@ -184,7 +183,7 @@
 		}
 	}
 
-	insert_ubicacion();
+	
 
 
 	// Obtener info de una noticia en concreto	
@@ -293,16 +292,20 @@
 	
 
 
-
 	//LEER E INSERTAR LOS BARRIOS DE SC DE TENERIFE EN LA BASE DE DATOS CON SUS COORDENADAS
-	function insert_coordenadas_bd(){
+	function insert_coordenadas_bd($archivo){
 		
 		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
 		$bulk = new MongoDB\Driver\BulkWrite;
 		$registros = array();
 
+
+		/*$ficheros = explode(scandir(Config::PATH."/dump/"),".csv");
+		$ficheros = scandir(Config::PATH."/dump/");
+		var_dump($ficheros);*/
+
 		//OBTENER DATOS DE CSV
-		if (($fichero = fopen(Config::PATH."/dump/barrios.csv", "r")) !== FALSE) {
+		if (($fichero = fopen(Config::PATH."/dump/".$archivo, "r")) !== FALSE) {
 			
 			// Lee los nombres de los campos
 			$nombres_campos = fgetcsv($fichero, 0, ",", "\"", "\"");
@@ -320,26 +323,50 @@
 			fclose($fichero);
 
 
-			//GUARDAR DATOS EN LA BASE DE DATOS
 			for ($i = 0; $i < count($registros); $i++) {
-				//echo "Nombre: " . $registros[$i]["BARRIO"] . "\n";
-		
+					
+				$lugar	= preg_replace("/[^A-Z0-9Ñ\-.]/", " ", strtoupper(quitar_tildes($registros[$i]['NOMBRE'])) );	//quitar tildes, pasar a mayuscula y extraños
+				$lugar	= preg_replace("/\s+/", " ", $lugar);								//Eliminar dobles espacios
+				$lugar	= trim($lugar); 										//Elimina espacios al principio y fin 
+
 				$doc = array(
 					'id'      	=> new MongoDB\BSON\ObjectID,     #Generate MongoID
-					'BARRIO'	=> $registros[$i]['BARRIO'],
-					'DISTRITO'	=> $registros[$i]['DISTRITO'],
+					'LUGAR'		=> $lugar,
+					//'DISTRITO'	=> $registros[$i]['DISTRITO'],
 					'LATITUD'	=> $registros[$i]['GRAD_Y'],
 					'LONGITUD'	=> $registros[$i]['GRAD_X']
 				);
-				$bulk->insert($doc);	
+				$bulk->insert($doc);
+					
 			}
+			
 
+			//Guardamos en la base de datos los lugares 		
 			$result = $mongo->executeBulkWrite('NoticiasDB.coordenadas', $bulk); # 'NoticiasDB' es la base de datos y 'coordenadas' la collection.  
 			printf("Se han insertado %d documentos en la base de datos\n", $result->getInsertedCount());
 		} 
-
 	}
 
+	//Ficheros csv a insertar
+	/*insert_coordenadas_bd("barrios.csv");
+	insert_coordenadas_bd("esculturas.csv");
+	insert_coordenadas_bd("farmacias.csv");
+	insert_coordenadas_bd("hoteles.csv");
+	insert_coordenadas_bd("instculturales.csv");
+	insert_coordenadas_bd("instdeportivas.csv");
+	insert_coordenadas_bd("instseguridad.csv");
+	insert_coordenadas_bd("miradores.csv");
+	insert_coordenadas_bd("parquesinfantiles.csv");
+	
+	insert_coordenadas_bd("administracionyserviciospublicos.csv");
+	insert_coordenadas_bd("agricultura.csv");
+	insert_coordenadas_bd("alimentacion.csv");
+	insert_coordenadas_bd("asociacionesciudadania.csv");
+	insert_coordenadas_bd("comercio.csv");
+	insert_coordenadas_bd("educacionycultura.csv");
+	insert_coordenadas_bd("medicinaysalud.csv");
+	insert_coordenadas_bd("general.csv");
+	insert_coordenadas_bd("hosteleriayrestauracion.csv"); */
 	
 
 	//CREAR FICHERO JSON SI AUN NO HA SIDO CREADO CON LA UBICACION y COORDENADAS DE CADA NOTICIA
@@ -358,8 +385,8 @@
 				//Guardar en un array los resultados
 				$arr[] = array(
 					'_id'		=> $r->id,
-					'BARRIO'	=> $r->BARRIO,
-					'DISTRITO'	=> $r->DISTRITO,
+					'LUGAR'		=> $r->LUGAR,
+					//'DISTRITO'	=> $r->DISTRITO,
 					'LATITUD'	=> $r->LATITUD,
 					'LONGITUD'	=> $r->LONGITUD
 				);	
@@ -387,6 +414,86 @@
 		}
 
 	}
+
+
+	function limpiar_csv($archivo){
+		$mongo 		= new MongoDB\Driver\Manager(Config::MONGODB);
+		$bulk 		= new MongoDB\Driver\BulkWrite;
+		$doc[0] 	= array('NOMBRE','GRAD_Y','GRAD_X');
+		$registros 	= array();
+
+		/* Codigos postales de Santa Cruz de Tenerife */
+		$cp_validos = array("38001","38002","38003","38004",
+				    "38006","38007","38008","38009",
+			            "38010","38107","38108","38110",
+				    "38111","38120","38129","38130",
+				    "38139","38140","38150","38160",
+				    "38170","38180","38291","38294");
+	
+		//OBTENER DATOS DE CSV
+		if (($fichero = fopen(Config::PATH."/dump/".$archivo, "r")) !== FALSE) {
+			
+			// Lee los nombres de los campos
+			$nombres_campos = fgetcsv($fichero, 0, ",", "\"", "\"");
+			$num_campos = count($nombres_campos);
+			
+			// Lee los registros
+			while (($datos = fgetcsv($fichero, 0, ",", "\"", "\"")) !== FALSE) {
+				for ($icampo = 0; $icampo < $num_campos; $icampo++) {
+					$registro[$nombres_campos[$icampo]] = $datos[$icampo];
+				}
+				$registros[] = $registro;
+			}
+			fclose($fichero);
+
+
+			if( in_array('cp', $nombres_campos) ){ //Si tiene campo cp el csv
+				for ($i = 0; $i < count($registros); $i++) {
+					if ( in_array($registros[$i]['cp'], $cp_validos) ) { //Si ese cp esta en sc añadimos el lugar sino no
+						
+						$lugar	= preg_replace("/[^A-Z0-9Ñ\-.]/", " ", strtoupper(quitar_tildes($registros[$i]['NOMBRE'])) );	//quitar tildes, pasar a mayuscula y extraños
+						$lugar	= preg_replace("/\s+/", " ", $lugar);								//Eliminar dobles espacios
+						$lugar	= trim($lugar); 										//Elimina espacios al principio y fin 
+						$lugar	= preg_replace("/AYTO/", "AYUNTAMIENTO", $lugar);
+
+						$doc[] = array(
+							'NOMBRE'	=> $lugar,
+							'GRAD_Y'	=> $registros[$i]['GRAD_Y'],
+							'GRAD_X'	=> $registros[$i]['GRAD_X']
+						);
+					}	
+				}
+
+				//Crear csv
+				if (($fichero = fopen(Config::PATH."/dump/nuevos/".$archivo, "w")) !== FALSE) { 
+					foreach($doc as $val) {
+						fputcsv($fichero, $val);
+					}
+					fclose($fichero);
+				}
+			}
+		} 		
+	}
+	/*limpiar_csv("administracionyserviciospublicos.csv");
+	limpiar_csv("administracionyserviciospublicos.csv");
+	limpiar_csv("agricultura.csv");
+	limpiar_csv("alimentacion.csv");
+	limpiar_csv("asociacionesciudadania.csv");
+	limpiar_csv("comercio.csv");
+	limpiar_csv("educacionycultura.csv");
+	limpiar_csv("medicinaysalud.csv");
+	limpiar_csv("general.csv");
+	limpiar_csv("hosteleriayrestauracion.csv");*/
+
+
+
+
+
+
+
+
+
+
 
 
 
