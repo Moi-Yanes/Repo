@@ -9,7 +9,9 @@
 
 	/* PHPExcel */
 	set_include_path(implode(PATH_SEPARATOR, array(realpath(Config::PATH .'/phpexcel/Classes/'),get_include_path(),)));
-
+	$insertados = 0; //Variable global para determinar numero de documentos insertados 
+	$ubicadas = 0;
+	$totales = 0;
 
 	//Eliminar lso acentos de las palabras claves obtenidas para poder compararlos correctamente con los almacenados en la base de datos(no tienen tilde)
 	function quitar_tildes($cadena) {
@@ -47,13 +49,20 @@
 			1. //Quedarse con letras(incluidas vocales con/sin acentos), espacios, guiones y puntos
 			2. //Quedarse solo con los nombres que empiecen por mayuscula compuestos o no
 		*/
-		$n_c = preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñ.-])/", " ", $texto);				
-		preg_match_all("/([A-ZÁÉÍÓÚ]{1}[A-Za-z0-9áéíóúÁÉÍÓÚ]+)((\s|\-|)(([0-9])|([A-ZÁÉÍÓÚ]{1}[A-Za-z0-9áéíóúÁÉÍÓÚ]+)))*/", $n_c, $coinciden);
+		$n_c = preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñ.-])/", " ", $texto);	
+		$n_c = quitar_tildes($n_c); 			
+		preg_match_all("/([A-Z]{1}[A-Za-z0-9]+)((\s|\-|)((\sde\s)|([0-9])|([A-Z]{1}[A-Za-z0-9]+)))*/", $n_c, $coinciden);
 		
 		$arr=array();
 		foreach($coinciden as $r){ 
 			foreach($r as $n){ 
-				$n = quitar_tildes($n); 				
+				$n = explode(' ',$n);
+				if(end($n) == ''){
+					array_pop($n);  //quita "" del final
+					array_pop($n);	//quita "de" del final
+				}
+				$n = implode(" ", $n);
+				//echo $n.'<br>';	
 				array_push($arr,strtoupper($n));//Meter en un array los resultados obtenidos despues de haber filtrado el texto mediante las expresiones regulares	       
 			}
 			break;	// Para quedarnos solo con los valores del primer subarray de coincidencias que son aquellos que cumplen completamente con la expresion regular dada
@@ -62,6 +71,7 @@
 		
 		return $arr;
 	}
+
 
 
 	// Calcular la ubicacion de la noticia e insertar en la base de datos
@@ -74,7 +84,8 @@
 		$mongo    = new MongoDB\Driver\Manager(Config::MONGODB);
 		$query    = new MongoDB\Driver\Query([]);
 		$bulk 	  = new MongoDB\Driver\BulkWrite;
-		
+		$articulos = array('EL','LA','LAS','LOS');
+
 		//Obtener barrios
 		$rows 	  = $mongo->executeQuery('NoticiasDB.coordenadas', $query); 
 		$barrios  = $rows->toArray();
@@ -112,18 +123,21 @@
 								$encontrado = true;
 								break;
 							}
-							/*if($encontrado == false){ //Comparacion parcial (en mayuscula)
+							if($encontrado == false){ //Comparacion parcial (en mayuscula)
+								$t = explode(' ',$t);
+								if(in_array($t[0], $articulos)){
+									array_shift($t);  //quita la primera palabra
+								}
+								$t = implode(" ", $t);
+
 								foreach($barr as $p){	
-									if(preg_match("/\s".$t."\s/",$p)){
-										if($t!='DE' && $t!='EL' && $t!='LA' && $t!='DEL' && $t!='LAS' && $t!='LOS'){
-											
-									    		$ubicacion = $t;
-											$encontrado = true;
-											break;	
-										}							
+									if ($t == $p) { //Comparacion de palabra exacta (en mayuscula)
+										$ubicacion = $t;
+										$encontrado = true;
+										break;
 									}							
 								}
-							}*/
+							}
 							if($encontrado==true)
 								break;	
 						}
@@ -136,6 +150,21 @@
 								$ubicacion = $d;
 								$encontrado = true;
 								break;
+							}
+							if($encontrado == false){ //Comparacion parcial (en mayuscula)
+								$d = explode(' ',$d);
+								if(in_array($d[0], $articulos)){	
+									array_shift($d);  		//quita la primera palabra
+								}
+								$d = implode(" ", $d);
+
+								foreach($barr as $p){	
+									if ($d == $p) { //Comparacion de palabra exacta (en mayuscula)
+										$ubicacion = $d;
+										$encontrado = true;
+										break;
+									}							
+								}
 							}
 							/*if($encontrado == false){ //Comparacion parcial (en mayuscula)
 								foreach($barr as $p){	
@@ -162,6 +191,8 @@
 						    ['$set' => ['ubicacion' => $ubicacion]],
 						    ['multi' => false, 'upsert' => false]
 						);	
+						echo "La ubicacion es: ".$ubicacion.'<br>';
+						$GLOBALS['ubicadas'] += 1;
 					}
 					elseif($encontrado == false){
 						$bulk->update(
@@ -169,22 +200,45 @@
 						    ['$set' => ['ubicacion' => "No encontrada"]],
 						    ['multi' => false, 'upsert' => false]
 						);
+						//echo "La ubicacion es: No encontrada".'<br>';
 					}
-					echo "La ubicacion es: ".$ubicacion.'<br>';
+					$GLOBALS['totales'] += 1;
 				}
 				$mongo->executeBulkWrite('NoticiasDB.noticia', $bulk); //Actualizar el campo ubicacion de la coleccion de noticias de la base de datos
 	
 			}else{
-				echo "No existe la noticia!";			
+				echo "No hay noticias!";			
 			}
 		}
 		else{
-			echo "No existe la noticia indicada".'<br>';
+			echo "No hay lugares!".'<br>';
 		}
 	}
-
 	
-
+	//Ficheros csv a insertar
+	/*insert_coordenadas_bd("barrios.csv");
+	insert_coordenadas_bd("esculturas.csv");
+	insert_coordenadas_bd("farmacias.csv");
+	insert_coordenadas_bd("hoteles.csv");
+	insert_coordenadas_bd("instculturales.csv");
+	insert_coordenadas_bd("instdeportivas.csv");
+	insert_coordenadas_bd("instseguridad.csv");
+	insert_coordenadas_bd("miradores.csv");
+	insert_coordenadas_bd("parquesinfantiles.csv");
+	
+	insert_coordenadas_bd("administracionyserviciospublicos.csv");
+	insert_coordenadas_bd("agricultura.csv");
+	//insert_coordenadas_bd("alimentacion.csv");
+	//insert_coordenadas_bd("hosteleriayrestauracion.csv"); 
+	insert_coordenadas_bd("asociacionesciudadania.csv");
+	insert_coordenadas_bd("comercio.csv");
+	insert_coordenadas_bd("educacionycultura.csv");
+	insert_coordenadas_bd("medicinaysalud.csv");
+	//insert_coordenadas_bd("general.csv");*/
+	
+	
+	insert_ubicacion();
+	echo "Se han ubicado: ".$ubicadas." de las ".$totales." que se han analizado.Porcentaje de acierto: ".round((($ubicadas/$totales)*100),2)." %";
 
 	// Obtener info de una noticia en concreto	
 	function get_noticia($id){
@@ -290,19 +344,28 @@
 		printf("Se han eliminado %d documentos en la base de datos\n", $result->getDeletedCount());
 	}
 	
+	
 
 
-	//LEER E INSERTAR LOS BARRIOS DE SC DE TENERIFE EN LA BASE DE DATOS CON SUS COORDENADAS
+
+	//LEER E INSERTAR LOS LUGARES DE SC DE TENERIFE EN LA BASE DE DATOS CON SUS COORDENADAS
 	function insert_coordenadas_bd($archivo){
 		
 		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
 		$bulk = new MongoDB\Driver\BulkWrite;
 		$registros = array();
 
+		//Obtener en un array los nombres de todos los ficheros y que se ejecute sola la insercion
+		/*
+			$ficheros = scandir(Config::PATH."/dump/");
+			foreach($ficheros as $archivo){
+				$extension = explode(".",$archivo)[1];
+				if ( $extension == "csv" )
+					echo $archivo.'<br>';
+			}
+			var_dump($ficheros);
+		*/
 
-		/*$ficheros = explode(scandir(Config::PATH."/dump/"),".csv");
-		$ficheros = scandir(Config::PATH."/dump/");
-		var_dump($ficheros);*/
 
 		//OBTENER DATOS DE CSV
 		if (($fichero = fopen(Config::PATH."/dump/".$archivo, "r")) !== FALSE) {
@@ -344,30 +407,12 @@
 			//Guardamos en la base de datos los lugares 		
 			$result = $mongo->executeBulkWrite('NoticiasDB.coordenadas', $bulk); # 'NoticiasDB' es la base de datos y 'coordenadas' la collection.  
 			printf("Se han insertado %d documentos en la base de datos\n", $result->getInsertedCount());
+			$GLOBALS['insertados'] += $result->getInsertedCount();
+			//echo $insertados;
 		} 
 	}
 
-	//Ficheros csv a insertar
-	/*insert_coordenadas_bd("barrios.csv");
-	insert_coordenadas_bd("esculturas.csv");
-	insert_coordenadas_bd("farmacias.csv");
-	insert_coordenadas_bd("hoteles.csv");
-	insert_coordenadas_bd("instculturales.csv");
-	insert_coordenadas_bd("instdeportivas.csv");
-	insert_coordenadas_bd("instseguridad.csv");
-	insert_coordenadas_bd("miradores.csv");
-	insert_coordenadas_bd("parquesinfantiles.csv");
-	
-	insert_coordenadas_bd("administracionyserviciospublicos.csv");
-	insert_coordenadas_bd("agricultura.csv");
-	insert_coordenadas_bd("alimentacion.csv");
-	insert_coordenadas_bd("asociacionesciudadania.csv");
-	insert_coordenadas_bd("comercio.csv");
-	insert_coordenadas_bd("educacionycultura.csv");
-	insert_coordenadas_bd("medicinaysalud.csv");
-	insert_coordenadas_bd("general.csv");
-	insert_coordenadas_bd("hosteleriayrestauracion.csv"); */
-	
+
 
 	//CREAR FICHERO JSON SI AUN NO HA SIDO CREADO CON LA UBICACION y COORDENADAS DE CADA NOTICIA
 	function create_json_marcadores(){
@@ -396,18 +441,15 @@
 			//Crear json con barrios y coordenadas
 			$nombre_archivo = Config::PATH.'/dump/coordenadas.json'; 
  
-			if(!file_exists($nombre_archivo)){
-				
+			if(!file_exists($nombre_archivo)){	
 				$fp = fopen($nombre_archivo,"w+");
 				fwrite($fp, json_encode($arr));
 				fclose($fp);	
 			}else{
-				
 				$fp = fopen($nombre_archivo,"a+");
 				fwrite($fp, json_encode($arr));
 				fclose($fp);
 			}
-			
 		}
 		else{
 			echo "No existen noticias";
@@ -454,7 +496,15 @@
 						$lugar	= preg_replace("/[^A-Z0-9Ñ\-.]/", " ", strtoupper(quitar_tildes($registros[$i]['NOMBRE'])) );	//quitar tildes, pasar a mayuscula y extraños
 						$lugar	= preg_replace("/\s+/", " ", $lugar);								//Eliminar dobles espacios
 						$lugar	= trim($lugar); 										//Elimina espacios al principio y fin 
-						$lugar	= preg_replace("/AYTO/", "AYUNTAMIENTO", $lugar);
+						$lugar	= str_replace("AYTO", "AYUNTAMIENTO", $lugar);
+						$lugar  = str_replace("PZA.", "PLAZA", $lugar);
+						$lugar  = str_replace("P.", "PARQUE", $lugar);
+						$lugar  = str_replace("D.", "DON", $lugar);
+						$lugar  = str_replace("B.", "BARRIO", $lugar);
+						$lugar  = str_replace("B .", "BARRIO", $lugar);
+						$lugar  = str_replace("A.A.V.V.", "ASOCIACION DE VECINOS", $lugar);
+						$lugar  = str_replace("CTRA.", "CARRETERA", $lugar);
+						$lugar  = str_replace("C.C.", "CENTRO COMERCIAL", $lugar);
 
 						$doc[] = array(
 							'NOMBRE'	=> $lugar,
@@ -465,16 +515,59 @@
 				}
 
 				//Crear csv
-				if (($fichero = fopen(Config::PATH."/dump/nuevos/".$archivo, "w")) !== FALSE) { 
+				if (($fichero = fopen(Config::PATH."/dump/".$archivo, "w")) !== FALSE) { 
 					foreach($doc as $val) {
 						fputcsv($fichero, $val);
 					}
 					fclose($fichero);
 				}
 			}
+			else{
+				for ($i = 0; $i < count($registros); $i++) {
+	
+					$lugar	= preg_replace("/[^A-Z0-9Ñ\-.]/", " ", strtoupper(quitar_tildes($registros[$i]['NOMBRE'])) );	//quitar tildes, pasar a mayuscula y extraños
+					$lugar	= preg_replace("/\s+/", " ", $lugar);								//Eliminar dobles espacios
+					$lugar	= trim($lugar); 										//Elimina espacios al principio y fin 
+					$lugar	= str_replace("AYTO", "AYUNTAMIENTO", $lugar);
+					$lugar  = str_replace("PZA.", "PLAZA", $lugar);
+					$lugar  = str_replace("P.", "PARQUE", $lugar);
+					$lugar  = str_replace("D.", "DON", $lugar);
+					$lugar  = str_replace("B.", "BARRIO", $lugar);
+					$lugar  = str_replace("B .", "BARRIO", $lugar);
+					$lugar  = str_replace("A.A.V.V.", "ASOCIACION DE VECINOS", $lugar);
+					$lugar  = str_replace("CTRA.", "CARRETERA", $lugar);
+					$lugar  = str_replace("C.C.", "CENTRO COMERCIAL", $lugar);
+
+					$doc[] = array(
+						'NOMBRE'	=> $lugar,
+						'GRAD_Y'	=> $registros[$i]['GRAD_Y'],
+						'GRAD_X'	=> $registros[$i]['GRAD_X']
+					);
+				}
+
+				//Crear csv
+				if (($fichero = fopen(Config::PATH."/dump/".$archivo, "w")) !== FALSE) { 
+					foreach($doc as $val) {
+						fputcsv($fichero, $val);
+					}
+					fclose($fichero);
+				}
+
+			}
 		} 		
 	}
-	/*limpiar_csv("administracionyserviciospublicos.csv");
+
+	/*limpiar_csv("administracionyserviciospublicos.csv");	//
+	limpiar_csv("agricultura.csv");				//
+	limpiar_csv("alimentacion.csv");			//
+	limpiar_csv("asociacionesciudadania.csv");		//contiene iglesias
+	limpiar_csv("comercio.csv");				//Contiene comercios
+	limpiar_csv("educacionycultura.csv");			//Contiene colegios
+	limpiar_csv("medicinaysalud.csv");
+	limpiar_csv("hosteleriayrestauracion.csv");*/
+	//limpiar_csv("esculturas.csv");
+	//limpiar_csv("parquesinfantiles.csv");
+/*
 	limpiar_csv("administracionyserviciospublicos.csv");
 	limpiar_csv("agricultura.csv");
 	limpiar_csv("alimentacion.csv");
@@ -482,11 +575,8 @@
 	limpiar_csv("comercio.csv");
 	limpiar_csv("educacionycultura.csv");
 	limpiar_csv("medicinaysalud.csv");
-	limpiar_csv("general.csv");
-	limpiar_csv("hosteleriayrestauracion.csv");*/
-
-
-
+	limpiar_csv("hosteleriayrestauracion.csv");
+*/
 
 
 
@@ -560,20 +650,6 @@
 		$result = $mongo->executeBulkWrite('NoticiasDB.noticia', $bulk); # 'NoticiasDB' es la base de datos y 'noticia' la collection.  
 		printf("Se han insertado %d documentos en la base de datos\n", $result->getInsertedCount());
 	}
-
-
-	// Pruebas 
-	//$arr = get_noticias_excel(); //leer excel de noticas
-	//echo count($arr);	
-	//insert_noticias_bd($arr);   // guardar noticias en bbdd
-
-	//remove_coleccion('noticia');
-	
-	//count_all_noticias();
-	//echo '<br>';
-	//remove_noticia('595b8133bc5cec0a8e7ebbd9', 'noticia');
-	//get_noticia('5861514401d0282764853a9e'); //Buscar noticia por id
-	//insert_coordenadas_bd();
 	
 ?>
 
