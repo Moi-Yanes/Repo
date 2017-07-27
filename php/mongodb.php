@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 <?php 
 	/* PHP ERRORS */
 	ini_set('display_errors','On');
@@ -17,19 +13,12 @@
 	$ubicadas = 0;
 	$totales = 0;
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 	//Eliminar lso acentos de las palabras claves obtenidas para poder compararlos correctamente con los almacenados en la base de datos(no tienen tilde)
 	function quitar_tildes($cadena) {
 		$no_permitidas= array ( "á","é","í","ó","ú",
 					"à","è","ì","ò","ù",
-<<<<<<< HEAD
 				      	"Á","É","Í","Ó","Ú","À",
-=======
-				      	"Á","É","Í","Ó","Ú","ñ","À",
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 					"Ã","Ì","Ò","Ù","Ã™","Ã ",
 					"Ã¨","Ã¬","Ã²","Ã¹","ç",
 					"Ç","Ã¢","ê","Ã®","Ã´","Ã»",
@@ -61,36 +50,21 @@
 			1. //Quedarse con letras(incluidas vocales con/sin acentos), espacios, guiones y puntos
 			2. //Quedarse solo con los nombres que empiecen por mayuscula compuestos o no
 		*/
-<<<<<<< HEAD
 		$n_c = preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñÑ.-])/", " ", $texto);	
 		$n_c = quitar_tildes($n_c); 			
 		preg_match_all("/([A-ZÑ]{1}[A-Za-z0-9Ññ]+)((\s|\-|)((\sde\s(la\s|el\s|las\s|los\s){0,1})|(\sdel\s)|([0-9])|([A-ZÑ]{1}[A-Za-z0-9Ññ]+)))*/", $n_c, $coinciden);
 	
-=======
-		$n_c = preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñ.-])/", " ", $texto);	
-		$n_c = quitar_tildes($n_c); 			
-		preg_match_all("/([A-Z]{1}[A-Za-z0-9]+)((\s|\-|)((\sde\s)|([0-9])|([A-Z]{1}[A-Za-z0-9]+)))*/", $n_c, $coinciden);
-		
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 		$arr=array();
 		foreach($coinciden as $r){ 
 			foreach($r as $n){ 
 				$n = explode(' ',$n);
 				if(end($n) == ''){
 					array_pop($n);  //quita "" del final
-<<<<<<< HEAD
 					array_pop($n);	//quita "de" o "del" del final
 				}
 				$n = implode(" ", $n);
 				//echo $n.'<br>';	
 				array_push($arr,strtoupper(str_replace('ñ', 'Ñ', $n)));//Meter en un array los resultados obtenidos despues de haber filtrado el texto       
-=======
-					array_pop($n);	//quita "de" del final
-				}
-				$n = implode(" ", $n);
-				//echo $n.'<br>';	
-				array_push($arr,strtoupper($n));//Meter en un array los resultados obtenidos despues de haber filtrado el texto mediante las expresiones regulares	       
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 			}
 			break;	// Para quedarnos solo con los valores del primer subarray de coincidencias que son aquellos que cumplen completamente con la expresion regular dada
 				// el resto de subarrays devueltos solo la cumplen parcialmente
@@ -111,15 +85,9 @@
 		$mongo    = new MongoDB\Driver\Manager(Config::MONGODB);
 		$query    = new MongoDB\Driver\Query([]);
 		$bulk 	  = new MongoDB\Driver\BulkWrite;
-<<<<<<< HEAD
 		$articulos = array('EL','LA','LAS','LOS'); //determinantes articulos determinados
 
 		//Obtener lugares
-=======
-		$articulos = array('EL','LA','LAS','LOS');
-
-		//Obtener barrios
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 		$rows 	  = $mongo->executeQuery('NoticiasDB.coordenadas', $query); 
 		$barrios  = $rows->toArray();
 		$barr 	  = array();/*array para guardar los barrios*/
@@ -128,16 +96,9 @@
 		$result   = $mongo->executeQuery('NoticiasDB.noticia', $query); 
 		$noticias = $result->toArray();
 
-<<<<<<< HEAD
 		if ( !empty($barrios) ){
 			
 			//Guardar en un array unicamente los nombres de los lugares
-=======
-
-		if ( !empty($barrios) ){
-			
-			//Guardar en un array unicamente los nombres de los barrios
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 			foreach($barrios as $r){
 				array_push($barr, $r->LUGAR);	
 			}
@@ -148,21 +109,17 @@
 					$encontrado = false;
 					$ubicacion = "";
 
-<<<<<<< HEAD
 				
 					//Copiar arrays
 					$c_titulo      = explode(' ',preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñÑ-])/",'',$n->titular));
 					$c_descripcion = explode(' ',preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñÑ-])/",'',$n->descripcion));
 
-=======
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 
 					//Eliminar caracteres innecesarios en las comparaciones
 					$titulo      = delete_caracteres_sobrantes($n->titular);
 					$descripcion = delete_caracteres_sobrantes($n->descripcion);
 
 
-<<<<<<< HEAD
 					//buscar en el titulo alguna coincidencia con los lugares
 					if($encontrado == false){
 						foreach($titulo as $t){		  						 
@@ -180,50 +137,17 @@
 									break;
 								}
 							}
-=======
-					//buscar en el titulo alguna coincidencia con los barrios
-					if($encontrado == false){
-						foreach($titulo as $t){		  //Decir Gregoria Alonso Jiménez no supone nada especial. Ni siquiera en Afur.						 
-							if (in_array($t, $barr)) { //Comparacion de palabra exacta (en mayuscula)
-								$ubicacion = $t;
-								$encontrado = true;
-								break;
-							}
-							if($encontrado == false){ //Comparacion parcial (en mayuscula)
-								$t = explode(' ',$t);
-								if(in_array($t[0], $articulos)){
-									array_shift($t);  //quita la primera palabra
-								}
-								$t = implode(" ", $t);
-
-								foreach($barr as $p){	
-									if ($t == $p) { //Comparacion de palabra exacta (en mayuscula)
-										$ubicacion = $t;
-										$encontrado = true;
-										break;
-									}							
-								}
-							}
-							if($encontrado==true)
-								break;	
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 						}
 					}
 
 					//buscar en la descripcion alguna coincidencia
 					if($encontrado == false){
-<<<<<<< HEAD
 						foreach($descripcion as $d){
 							if (in_array($d, $barr)) { 			//Comparacion de palabra exacta (en mayuscula)
-=======
-						foreach($descripcion as $d){	
-							if (in_array($d, $barr)) { //Comparacion de palabra exacta (en mayuscula)
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 								$ubicacion = $d;
 								$encontrado = true;
 								break;
 							}
-<<<<<<< HEAD
 						}
 						if($encontrado == false){ 
 							foreach($barr as $p){
@@ -247,39 +171,6 @@
 							$encontrado = true;
 						}	
 					}							
-=======
-							if($encontrado == false){ //Comparacion parcial (en mayuscula)
-								$d = explode(' ',$d);
-								if(in_array($d[0], $articulos)){	
-									array_shift($d);  		//quita la primera palabra
-								}
-								$d = implode(" ", $d);
-
-								foreach($barr as $p){	
-									if ($d == $p) { //Comparacion de palabra exacta (en mayuscula)
-										$ubicacion = $d;
-										$encontrado = true;
-										break;
-									}							
-								}
-							}
-							/*if($encontrado == false){ //Comparacion parcial (en mayuscula)
-								foreach($barr as $p){	
-									if(preg_match("/\s".$d."\s/",$p)){
-										if($d!='DE' && $d!='EL' && $d!='LA' && $d!='DEL' && $d!='LAS' && $d!='LOS'){
-											
-									    		$ubicacion = $d;
-											$encontrado = true;
-											break;	
-										}							
-									}							
-								}
-							}*/
-							if($encontrado==true)
-								break;	
-						}
-					}					
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 
 
 					//Guardar ubicacion en la bbdd	
@@ -292,29 +183,16 @@
 						echo "La ubicacion es: ".$ubicacion.'<br>';
 						$GLOBALS['ubicadas'] += 1;
 					}
-<<<<<<< HEAD
 					elseif($encontrado == false){					
-=======
-					elseif($encontrado == false){
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 						$bulk->update(
 						    ['_id' => new MongoDB\BSON\ObjectID($n->_id)],
 						    ['$set' => ['ubicacion' => "No encontrada"]],
 						    ['multi' => false, 'upsert' => false]
 						);
-<<<<<<< HEAD
 					}$GLOBALS['totales'] += 1;
 				}
 				$mongo->executeBulkWrite('NoticiasDB.noticia', $bulk); //Actualizar el campo ubicacion de la coleccion de noticias de la base de datos
 				
-=======
-						//echo "La ubicacion es: No encontrada".'<br>';
-					}
-					$GLOBALS['totales'] += 1;
-				}
-				$mongo->executeBulkWrite('NoticiasDB.noticia', $bulk); //Actualizar el campo ubicacion de la coleccion de noticias de la base de datos
-	
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 			}else{
 				echo "No hay noticias!";			
 			}
@@ -337,18 +215,12 @@
 	
 	insert_coordenadas_bd("administracionyserviciospublicos.csv");
 	insert_coordenadas_bd("agricultura.csv");
-<<<<<<< HEAD
 	insert_coordenadas_bd("alimentacion.csv");
 	insert_coordenadas_bd("hosteleriayrestauracion.csv");
-=======
-	//insert_coordenadas_bd("alimentacion.csv");
-	//insert_coordenadas_bd("hosteleriayrestauracion.csv"); 
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 	insert_coordenadas_bd("asociacionesciudadania.csv");
 	insert_coordenadas_bd("comercio.csv");
 	insert_coordenadas_bd("educacionycultura.csv");
 	insert_coordenadas_bd("medicinaysalud.csv");
-<<<<<<< HEAD
 	insert_coordenadas_bd("carreteras.csv");
 	//insert_coordenadas_bd("general.csv");
 	insert_coordenadas_bd("distritos.csv");
@@ -362,13 +234,6 @@
 										echo "si";
 									}else echo "no";*/
 
-=======
-	//insert_coordenadas_bd("general.csv");*/
-	
-	
-	insert_ubicacion();
-	echo "Se han ubicado: ".$ubicadas." de las ".$totales." que se han analizado.Porcentaje de acierto: ".round((($ubicadas/$totales)*100),2)." %";
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 
 	// Obtener info de una noticia en concreto	
 	function get_noticia($id){
@@ -706,11 +571,8 @@
 	limpiar_csv("educacionycultura.csv");
 	limpiar_csv("medicinaysalud.csv");
 	limpiar_csv("hosteleriayrestauracion.csv");
-<<<<<<< HEAD
 	limpiar_csv("carreteras.csv");
 	limpiar_csv("lugares.csv");
-=======
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 */
 
 
@@ -722,10 +584,6 @@
 
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 9c5826bd53c9ebbb20b5429462e8b01b68653b91
 	//EXCEL
 	// Obtener listado de noticias a partir de un fichero excel
 	function get_noticias_excel() {
@@ -790,14 +648,4 @@
 	}
 	
 ?>
-
-
-
-
-
-
-
-
-
-
 
