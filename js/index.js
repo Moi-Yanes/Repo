@@ -23,7 +23,7 @@ function addMarkers(){
 	
 	//Obtener json
 	$.getJSON("http://localhost/TFG/dump/coordenadas.json", function(json) {
-	
+		
 		// Recorrer el JSON para obtener los datos
 		for (var i = 0, length = json.length; i < length; i++) {
 			var data = json[i],
@@ -34,7 +34,7 @@ function addMarkers(){
 			var marker = new google.maps.Marker({
 				position: latLng,
 				map: map,
-				title: data.BARRIO
+				title: data.TITULO
 			});
 
 
@@ -43,7 +43,7 @@ function addMarkers(){
 
 				// Attaching a click event to the current marker
 				google.maps.event.addListener(marker, "click", function(e) {
-					infowindow.setContent(data.DISTRITO);
+					infowindow.setContent(data.DESCRIPCION);
 					infowindow.open(map, marker);
 				});
 

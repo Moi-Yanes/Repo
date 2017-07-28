@@ -9,9 +9,6 @@
 
 	/* PHPExcel */
 	set_include_path(implode(PATH_SEPARATOR, array(realpath(Config::PATH .'/phpexcel/Classes/'),get_include_path(),)));
-	$insertados = 0; //Variable global para determinar numero de documentos insertados 
-	$ubicadas = 0;
-	$totales = 0;
 
 
 	//Eliminar lso acentos de las palabras claves obtenidas para poder compararlos correctamente con los almacenados en la base de datos(no tienen tilde)
@@ -54,6 +51,7 @@
 		$n_c = quitar_tildes($n_c); 			
 		preg_match_all("/([A-ZÑ]{1}[A-Za-z0-9Ññ]+)((\s|\-|)((\sde\s(la\s|el\s|las\s|los\s){0,1})|(\sdel\s)|([0-9])|([A-ZÑ]{1}[A-Za-z0-9Ññ]+)))*/", $n_c, $coinciden);
 	
+
 		$arr=array();
 		foreach($coinciden as $r){ 
 			foreach($r as $n){ 
@@ -63,13 +61,12 @@
 					array_pop($n);	//quita "de" o "del" del final
 				}
 				$n = implode(" ", $n);
-				//echo $n.'<br>';	
+			
 				array_push($arr,strtoupper(str_replace('ñ', 'Ñ', $n)));//Meter en un array los resultados obtenidos despues de haber filtrado el texto       
 			}
 			break;	// Para quedarnos solo con los valores del primer subarray de coincidencias que son aquellos que cumplen completamente con la expresion regular dada
 				// el resto de subarrays devueltos solo la cumplen parcialmente
 		}
-		
 		return $arr;
 	}
 
@@ -85,7 +82,6 @@
 		$mongo    = new MongoDB\Driver\Manager(Config::MONGODB);
 		$query    = new MongoDB\Driver\Query([]);
 		$bulk 	  = new MongoDB\Driver\BulkWrite;
-		$articulos = array('EL','LA','LAS','LOS'); //determinantes articulos determinados
 
 		//Obtener lugares
 		$rows 	  = $mongo->executeQuery('NoticiasDB.coordenadas', $query); 
@@ -98,21 +94,18 @@
 
 		if ( !empty($barrios) ){
 			
-			//Guardar en un array unicamente los nombres de los lugares
+			//Guardar en un array los nombres de los lugares, su latitud y su longitud
 			foreach($barrios as $r){
-				array_push($barr, $r->LUGAR);	
+				array_push($barr, [$r->LUGAR,$r->LATITUD,$r->LONGITUD]);	
 			}
 
+			
 			//Recorrer cada una de las noticas
 			if ( !empty($noticias) ){
 				foreach($noticias as $n){
 					$encontrado = false;
-					$ubicacion = "";
-
-				
-					//Copiar arrays
-					$c_titulo      = explode(' ',preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñÑ-])/",'',$n->titular));
-					$c_descripcion = explode(' ',preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñÑ-])/",'',$n->descripcion));
+					$ubicacion  = "";      /* nombre de la ubicacion */
+					$latlong    = array(); /* latitud y longitud de la ubicacion */
 
 
 					//Eliminar caracteres innecesarios en las comparaciones
@@ -120,19 +113,30 @@
 					$descripcion = delete_caracteres_sobrantes($n->descripcion);
 
 
-					//buscar en el titulo alguna coincidencia con los lugares
+					//Copiar arrays
+					$c_titulo      = explode(' ',preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñÑ-])/",'',$n->titular));
+					$c_descripcion = explode(' ',preg_replace("/([^A-Za-z0-9[:space:]áéíóúÁÉÍÓÚñÑ-])/",'',$n->descripcion));
+
+	
+					//BUSCAR EN EL TITULO alguna coincidencia con los lugares
 					if($encontrado == false){
-						foreach($titulo as $t){		  						 
-							if (in_array($t, $barr)) { 			//Comparacion de palabra exacta (en mayuscula)
-								$ubicacion = $t;
-								$encontrado = true;
-								break;
-							}	
+						foreach($titulo as $t){	
+							foreach($barr as $p){						 
+								if (in_array($t, $p)) { 			//Comparacion de palabra exacta (en mayuscula)
+									$ubicacion = $p[0];
+									$latlong = [$p[1],$p[2]];		//latlong[0] -- latitud  | latlong[1] -- longitud
+									$encontrado = true;
+									break;
+								}
+							}
+							if($encontrado==true)
+								break;	
 						}
 						if($encontrado == false){ 
 							foreach($barr as $p){
-								if(preg_grep("/\b".$p."\b/", $titulo) ){ //Comparacion parcial (en mayuscula)
-									$ubicacion = $p;
+								if(preg_grep("/\b".$p[0]."\b/", $titulo) ){ 	//Comparacion parcial (en mayuscula)
+									$ubicacion = $p[0];
+									$latlong = [$p[1],$p[2]];
 									$encontrado = true;
 									break;
 								}
@@ -140,19 +144,25 @@
 						}
 					}
 
-					//buscar en la descripcion alguna coincidencia
+					//BUSCAR EN LA DESCRIPCION alguna coincidencia
 					if($encontrado == false){
 						foreach($descripcion as $d){
-							if (in_array($d, $barr)) { 			//Comparacion de palabra exacta (en mayuscula)
-								$ubicacion = $d;
-								$encontrado = true;
-								break;
+							foreach($barr as $p){	
+								if (in_array($d, $p)) { 			//Comparacion de palabra exacta (en mayuscula)
+									$ubicacion = $p[0];
+									$latlong = [$p[1],$p[2]];
+									$encontrado = true;
+									break;
+								}
 							}
+							if($encontrado==true)
+								break;
 						}
 						if($encontrado == false){ 
 							foreach($barr as $p){
-								if(preg_grep("/\b".$p."\b/", $descripcion) ){ //Comparacion parcial (en mayuscula)
-									$ubicacion = $p;
+								if(preg_grep("/\b".$p[0]."\b/", $descripcion) ){ //Comparacion parcial (en mayuscula)
+									$ubicacion = $p[0];
+									$latlong = [$p[1],$p[2]];
 									$encontrado = true;
 									break;
 								}
@@ -161,38 +171,34 @@
 					}
 
 
-					if($encontrado == false){ //Si no se ha encontrado ninguna palabra clave en las comparaciones previas buscamos la palabra capital por si aparece	
-						if(in_array("capital", $c_titulo) ){
+					//Si no se ha encontrado ninguna palabra clave en las comparaciones previas buscamos la palabra capital por si aparece
+					if($encontrado == false){	
+						if(in_array("capital", $c_titulo) || in_array("capital", $c_descripcion)){
 							$ubicacion = "SANTA CRUZ DE TENERIFE";
-							$encontrado = true;
-						}
-						elseif(in_array("capital", $c_descripcion) ){
-							$ubicacion = "SANTA CRUZ DE TENERIFE";
+							$latlong = [28.463938,-16.262598];
 							$encontrado = true;
 						}	
 					}							
 
 
-					//Guardar ubicacion en la bbdd	
+					//GUARDAR UBICACION EN LA BBDD CON SUS COORDENADAS	
 					if($encontrado == true){
 						$bulk->update(
 						    ['_id' => new MongoDB\BSON\ObjectID($n->_id)],
-						    ['$set' => ['ubicacion' => $ubicacion]],
+						    ['$set' => ['ubicacion' => $ubicacion, 'latitud' => $latlong[0], 'longitud' => $latlong[1] ]],
 						    ['multi' => false, 'upsert' => false]
 						);	
-						echo "La ubicacion es: ".$ubicacion.'<br>';
-						$GLOBALS['ubicadas'] += 1;
+						//echo "La ubicacion es: ".$ubicacion." Latitud: ".$latlong[0]." longitud: ".$latlong[1].'<br>';
 					}
 					elseif($encontrado == false){					
 						$bulk->update(
 						    ['_id' => new MongoDB\BSON\ObjectID($n->_id)],
-						    ['$set' => ['ubicacion' => "No encontrada"]],
+						    ['$set' => ['ubicacion' => "No encontrada", 'latitud' => 0, 'longitud' => 0 ]],
 						    ['multi' => false, 'upsert' => false]
 						);
-					}$GLOBALS['totales'] += 1;
+					}
 				}
 				$mongo->executeBulkWrite('NoticiasDB.noticia', $bulk); //Actualizar el campo ubicacion de la coleccion de noticias de la base de datos
-				
 			}else{
 				echo "No hay noticias!";			
 			}
@@ -224,15 +230,11 @@
 	insert_coordenadas_bd("carreteras.csv");
 	//insert_coordenadas_bd("general.csv");
 	insert_coordenadas_bd("distritos.csv");
-	insert_coordenadas_bd("lugares.csv");*/
+	insert_coordenadas_bd("lugares.csv");
 	
 	
-
-	insert_ubicacion();
-	echo "Se han ubicado: ".$ubicadas." de las ".$totales." que se han analizado.Porcentaje de acierto: ".round((($ubicadas/$totales)*100),2)." %";
-	/*if(preg_grep("/SANTA MARIA DEL MAR/", ["AYUNTAMIENTO DE SANTA MARIA DEL MAR","PEDRO ALONSO","PACO SANZ"]) ){ //Comparacion de palabra exacta (en mayuscula)
-										echo "si";
-									}else echo "no";*/
+	insert_ubicacion();*/
+	
 
 
 	// Obtener info de una noticia en concreto	
@@ -273,7 +275,6 @@
 		
 		$rows = $mongo->executeQuery('NoticiasDB.'.$coleccion, $query); // $mongo contains the connection object to MongoDB
 		$fila = $rows->toArray();
-		$fecha = date_create();
 
 		if ( !empty($fila) ){
 			foreach($fila as $r){
@@ -343,7 +344,7 @@
 
 
 
-	//LEER E INSERTAR LOS LUGARES DE SC DE TENERIFE EN LA BASE DE DATOS CON SUS COORDENADAS
+	//LEER E INSERTAR TODOS LOS FICHEROS DEL DIRECTORIO DUMP EN LA BASE DE DATOS (LUGARES DE SC DE TENERIFE)
 	function insert_coordenadas_bd($archivo){
 		
 		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
@@ -394,16 +395,13 @@
 					'LATITUD'	=> $registros[$i]['GRAD_Y'],
 					'LONGITUD'	=> $registros[$i]['GRAD_X']
 				);
-				$bulk->insert($doc);
-					
+				$bulk->insert($doc);	
 			}
 			
 
 			//Guardamos en la base de datos los lugares 		
 			$result = $mongo->executeBulkWrite('NoticiasDB.coordenadas', $bulk); # 'NoticiasDB' es la base de datos y 'coordenadas' la collection.  
 			printf("Se han insertado %d documentos en la base de datos\n", $result->getInsertedCount());
-			$GLOBALS['insertados'] += $result->getInsertedCount();
-			//echo $insertados;
 		} 
 	}
 
@@ -415,22 +413,46 @@
 		$mongo = new MongoDB\Driver\Manager(Config::MONGODB);
 		$query = new MongoDB\Driver\Query([]);
 		
-		$rows = $mongo->executeQuery('NoticiasDB.coordenadas', $query); // $mongo contains the connection object to MongoDB
+		$rows = $mongo->executeQuery('NoticiasDB.noticia', $query); // $mongo contains the connection object to MongoDB
 		$fila = $rows->toArray();
+		$datos = array();
 		
 		//Leer filas resultantes de la consulta
 		if ( !empty($fila) ){
 			foreach($fila as $r){
 
+				$titulo 	= quitar_tildes($r->titular);
+				$descripcion 	= quitar_tildes($r->descripcion);
+
+				$titulo		= preg_replace("/([^A-Za-z0-9,[:space:]áéíóúÁÉÍÓÚñÑ.-])\(\)/", "", $titulo);
+				$descripcion 	= preg_replace("/([^A-Za-z0-9,[:space:]áéíóúÁÉÍÓÚñÑ.-])\(\)/", "", $descripcion);
+
 				//Guardar en un array los resultados
-				$arr[] = array(
-					'_id'		=> $r->id,
-					'LUGAR'		=> $r->LUGAR,
-					//'DISTRITO'	=> $r->DISTRITO,
-					'LATITUD'	=> $r->LATITUD,
-					'LONGITUD'	=> $r->LONGITUD
-				);	
+				$arr = array(
+					'_id'		=> $r->_id,
+					'PERIODICO'	=> quitar_tildes($r->periodico),
+					'TITULO'	=> $titulo,
+					'DESCRIPCION'	=> $descripcion,
+					'LINK'		=> $r->link,
+					'RSS'		=> $r->rss,
+					'FECHA'		=> (new MongoDB\BSON\UTCDateTime((string)$r->fecha))->toDateTime()->format('d-m-Y'),
+					'UBICACION'	=> $r->ubicacion,
+					'LATITUD'	=> $r->latitud,
+					'LONGITUD'	=> $r->longitud,
+				);
+	
+				$datos[] = $arr;	
 			}
+			/*{ "_id" : ObjectId("5861514401d0282764853aaf"), 
+			"periodico" : "El Día", 
+			"titular" : "Unidos por  un infarto", 
+			"descripcion" : "Dice el sabi", 
+			"link" : "http://eldia.es/2016-07-10/santacruz/5-Unidos-infarto.htm", 
+			"rss" : "Santa Cruz de Tenerife", 
+			"fecha" : ISODate("2016-07-09T23:00:00Z"), 
+			"ubicacion" : "OFRA", 
+			"latitud" : "", 
+			"longitud" : "" }*/
 
 			
 			//Crear json con barrios y coordenadas
@@ -438,11 +460,11 @@
  
 			if(!file_exists($nombre_archivo)){	
 				$fp = fopen($nombre_archivo,"w+");
-				fwrite($fp, json_encode($arr));
+				fwrite($fp, json_encode($datos));
 				fclose($fp);	
 			}else{
 				$fp = fopen($nombre_archivo,"a+");
-				fwrite($fp, json_encode($arr));
+				fwrite($fp, json_encode($datos));
 				fclose($fp);
 			}
 		}
@@ -451,6 +473,9 @@
 		}
 
 	}
+
+	//create_json_marcadores();
+
 
 
 	function limpiar_csv($archivo){
