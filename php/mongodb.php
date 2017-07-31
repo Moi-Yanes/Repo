@@ -406,6 +406,52 @@
 	}
 
 
+	//DIVIDIR ARRAY Y AGRUPAR NOTICIAS SEGUN SU UBICACION
+	function split_array($array){
+
+		$groupedArray   = array();
+		$ubicacionArray = array();
+
+		foreach($array as $key => $r){
+
+			//consigo la ubicacion actual
+			$ubicacion = $r->ubicacion;
+
+			//verifico si la ubicacion existe en mi array donde alojo las noticias y su ubicacion //si no existe, lo agrego
+			if(!in_array($ubicacion, $ubicacionArray)){
+			$ubicacionArray[] = $ubicacion;
+			}
+
+			//busco la ubicacion actual
+			$ubicacionIndex = array_search($ubicacion, $ubicacionArray);
+
+			//agrego el registro dentro del array con sus valores
+			$titulo 	= quitar_tildes($r->titular);
+			$descripcion 	= quitar_tildes($r->descripcion);
+
+			$titulo		= preg_replace("/([^A-Za-z0-9,[:space:]áéíóúÁÉÍÓÚñÑ.-])\(\)/", "", $titulo);
+			$descripcion 	= preg_replace("/([^A-Za-z0-9,[:space:]áéíóúÁÉÍÓÚñÑ.-])\(\)/", "", $descripcion);
+
+			$arr = array(
+				'_id'		=> $r->_id,
+				'PERIODICO'	=> quitar_tildes($r->periodico),
+				'TITULO'	=> $titulo,
+				'DESCRIPCION'	=> $descripcion,
+				'LINK'		=> $r->link,
+				'RSS'		=> $r->rss,
+				'FECHA'		=> (new MongoDB\BSON\UTCDateTime((string)$r->fecha))->toDateTime()->format('d-m-Y'),
+				'UBICACION'	=> $r->ubicacion,
+				'LATITUD'	=> $r->latitud,
+				'LONGITUD'	=> $r->longitud,
+			);
+
+			$groupedArray[$ubicacionIndex][] = $arr;
+		}
+
+		return $groupedArray;
+	}
+
+
 
 	//CREAR FICHERO JSON SI AUN NO HA SIDO CREADO CON LA UBICACION y COORDENADAS DE CADA NOTICIA
 	function create_json_marcadores(){
@@ -415,56 +461,23 @@
 		
 		$rows = $mongo->executeQuery('NoticiasDB.noticia', $query); // $mongo contains the connection object to MongoDB
 		$fila = $rows->toArray();
-		$datos = array();
 		
+
 		//Leer filas resultantes de la consulta
 		if ( !empty($fila) ){
-			foreach($fila as $r){
-
-				$titulo 	= quitar_tildes($r->titular);
-				$descripcion 	= quitar_tildes($r->descripcion);
-
-				$titulo		= preg_replace("/([^A-Za-z0-9,[:space:]áéíóúÁÉÍÓÚñÑ.-])\(\)/", "", $titulo);
-				$descripcion 	= preg_replace("/([^A-Za-z0-9,[:space:]áéíóúÁÉÍÓÚñÑ.-])\(\)/", "", $descripcion);
-
-				//Guardar en un array los resultados
-				$arr = array(
-					'_id'		=> $r->_id,
-					'PERIODICO'	=> quitar_tildes($r->periodico),
-					'TITULO'	=> $titulo,
-					'DESCRIPCION'	=> $descripcion,
-					'LINK'		=> $r->link,
-					'RSS'		=> $r->rss,
-					'FECHA'		=> (new MongoDB\BSON\UTCDateTime((string)$r->fecha))->toDateTime()->format('d-m-Y'),
-					'UBICACION'	=> $r->ubicacion,
-					'LATITUD'	=> $r->latitud,
-					'LONGITUD'	=> $r->longitud,
-				);
-	
-				$datos[] = $arr;	
-			}
-			/*{ "_id" : ObjectId("5861514401d0282764853aaf"), 
-			"periodico" : "El Día", 
-			"titular" : "Unidos por  un infarto", 
-			"descripcion" : "Dice el sabi", 
-			"link" : "http://eldia.es/2016-07-10/santacruz/5-Unidos-infarto.htm", 
-			"rss" : "Santa Cruz de Tenerife", 
-			"fecha" : ISODate("2016-07-09T23:00:00Z"), 
-			"ubicacion" : "OFRA", 
-			"latitud" : "", 
-			"longitud" : "" }*/
-
+			
+			$noticias_agrupadas = split_array($fila);//agrupar noticias por ubicacion
 			
 			//Crear json con barrios y coordenadas
 			$nombre_archivo = Config::PATH.'/dump/coordenadas.json'; 
  
 			if(!file_exists($nombre_archivo)){	
 				$fp = fopen($nombre_archivo,"w+");
-				fwrite($fp, json_encode($datos));
+				fwrite($fp, json_encode($noticias_agrupadas));
 				fclose($fp);	
 			}else{
 				$fp = fopen($nombre_archivo,"a+");
-				fwrite($fp, json_encode($datos));
+				fwrite($fp, json_encode($noticias_agrupadas));
 				fclose($fp);
 			}
 		}
