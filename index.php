@@ -34,19 +34,21 @@
 									<div id="title_d1b" class="col-md-9">
 										<h2>Noticias</h2>
 									</div>
-									<div  id="btn_d1b" class="col-md-3">
-										<input onclick="toggleDiv('option_box_div');" 
-											class="open_option_div" 
-											type="image" 
-											src="<?php echo SERVER_PATH; ?>images/puntos_suspensivos.png" 
-										/>	
+									<div id="btn_d1b" class="col-md-3">
+										<div class="div_img"> 
+											<input onclick="toggleDiv('option_box_div');" 
+												class="open_option_div" 
+												type="image" 
+												src="<?php echo SERVER_PATH; ?>images/puntos.png" 
+											/>
+										</div>	
 									</div>
 								</div>
 							</div>
-							<div id="d2b" class="container-fluid">
+							<div id="d2b" class="container">
 								<div class="row">
 									<div id="content_d2b1" class="col-md-12">
-										<input class="nextBtn" type="button" value="Next">	
+											
 									</div>
 								</div>
 							</div>	
@@ -66,17 +68,19 @@
 										<h2 >Noticias</h2>
 									</div>
 									<div id="btn_d1b2" class="col-md-3">
-										<input onclick="toggleDiv('option_box_div');" 
-											class="open_option_div" 
-											type="image" 
-											src="<?php echo SERVER_PATH; ?>images/puntos_suspensivos.png" 
-										/>
+										<div class="div_img"> 
+											<input onclick="toggleDiv('option_box_div');" 
+												class="open_option_div" 
+												type="image" 
+												src="<?php echo SERVER_PATH; ?>images/puntos.png" 
+											/>
+										</div>
 									</div>
 								</div>
 							</div>
-							<div id="d2b2" class="container-fluid">
+							<div id="d2b2" class="container">
 								<div class="row">
-									<div id="content_d2b2" class="col-md-12">
+									<div id="content_d2b2" class="col-md-12 ">
 										<input class="backBtn" type="button" value="Back">
 									</div>
 								</div>
@@ -103,6 +107,7 @@
 			
 		</div>
 
+		<!-- div de opciones de los box da igual donde se ponga(position absolute)-->
 		<div id="option_box_div" class=""> 
 			<div id="option_box_div_2" class=""> 
 				bla

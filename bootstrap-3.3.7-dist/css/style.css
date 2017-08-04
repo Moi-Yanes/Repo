@@ -195,10 +195,34 @@ html, body, .container-fluid, #map {
 
 
 .open_option_div{
-	height:22px;
-	width:22px;
+	
+	height:45px;
+	width:45px;
 }
 
+.div_img{
+	border-radius: 50%;
+	margin-left:15%;
+	height:45px;
+	width:45px;
+	text-align:center;
+}
+
+.img_izquierda {
+	margin-left: 15px;
+	margin-right: -80px;
+	height:40px;
+	width:40px;
+	float: left;  
+}
+
+.img_derecha {
+	height:30px;
+	width:30px;
+	float: right;
+	margin-left: -80px;
+	margin-right: 15px;
+}
 
 
 /* FOOTER */
