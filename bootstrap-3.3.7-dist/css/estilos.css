@@ -1,0 +1,79 @@
+html, body, .container-fluid, #map {
+	height:100%;
+}
+
+.fill-height{
+	height: calc(100% - 70px); /*quitar a la fila del centro el tamaño del header y del footer*/
+}
+
+#map {
+	height: 100%;
+}
+
+
+
+/* MENU DE NAVEGACION */
+#menu {
+	height:50px;
+	background-color: #565454;
+}
+
+
+
+
+/* CONTENIDO DE LA PAGINA */
+#column-left{
+	height: 100%;	
+}
+	#d1c{
+		height: 10%;
+		background-color: #db4437;
+	}
+
+	#d2c{
+		height: 80%;
+		/*overflow:scroll;
+		overflow-x:hidden;*/
+		background-color: #f7f8f9;
+	}
+
+	#d3c{
+		height: 10%;
+		background-color: #db4437;
+	}
+
+
+
+
+/* FOOTER */
+#footer {
+	height:20px;
+}
+
+
+
+.innerLiner{
+	width: 100%;
+	height: 100%;
+}
+
+.mycontainer{
+	height: 100%;
+	overflow-x: hidden;
+	white-space:nowrap;
+	margin:0;
+	padding:0;
+}
+.box{
+	display: inline-block;	
+	width: inherit;
+	height: 100%;
+	vertical-align: top;
+	background-color: #db4437;
+}
+
+.box2{
+	height: 100%;
+	width: inherit;
+    	background-color: #f7f8f9;
+}

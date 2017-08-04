@@ -11,6 +11,11 @@
 	set_include_path(implode(PATH_SEPARATOR, array(realpath(Config::PATH .'/phpexcel/Classes/'),get_include_path(),)));
 
 
+	/*Variables globales*/
+	$noticias_totales =0;
+	$noticias_ubicadas=0;
+
+
 	//Eliminar lso acentos de las palabras claves obtenidas para poder compararlos correctamente con los almacenados en la base de datos(no tienen tilde)
 	function quitar_tildes($cadena) {
 		$no_permitidas= array ( "á","é","í","ó","ú",
@@ -106,7 +111,7 @@
 					$encontrado = false;
 					$ubicacion  = "";      /* nombre de la ubicacion */
 					$latlong    = array(); /* latitud y longitud de la ubicacion */
-
+					$GLOBALS['noticias_totales'] ++;
 
 					//Eliminar caracteres innecesarios en las comparaciones
 					$titulo      = delete_caracteres_sobrantes($n->titular);
@@ -183,6 +188,7 @@
 
 					//GUARDAR UBICACION EN LA BBDD CON SUS COORDENADAS	
 					if($encontrado == true){
+						$GLOBALS['noticias_ubicadas'] ++;
 						$bulk->update(
 						    ['_id' => new MongoDB\BSON\ObjectID($n->_id)],
 						    ['$set' => ['ubicacion' => $ubicacion, 'latitud' => $latlong[0], 'longitud' => $latlong[1] ]],
@@ -231,9 +237,9 @@
 	//insert_coordenadas_bd("general.csv");
 	insert_coordenadas_bd("distritos.csv");
 	insert_coordenadas_bd("lugares.csv");
+	*/
 	
-	
-	insert_ubicacion();*/
+	//insert_ubicacion();
 	
 
 
@@ -415,7 +421,7 @@
 		foreach($array as $key => $r){
 
 			//consigo la ubicacion actual
-			$ubicacion = $r->ubicacion;
+			$ubicacion = $r->latitud;
 
 			//verifico si la ubicacion existe en mi array donde alojo las noticias y su ubicacion //si no existe, lo agrego
 			if(!in_array($ubicacion, $ubicacionArray)){

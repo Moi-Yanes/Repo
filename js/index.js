@@ -1,5 +1,8 @@
+/* Declarariom de funciones javascript */
+
 
 //INICIALIZAR MAPA CREANDO EL ARRAY DE LOCALIZACIONES
+var globaljson;
 function initMap() {
 
 	var map = new google.maps.Map(document.getElementById('map'), {
@@ -31,6 +34,7 @@ function initMap() {
 					    '</div>';
 
 			locations.push({'lat' : parseFloat(data[0].LATITUD), 'lng': parseFloat(data[0].LONGITUD), 'info':  contentString});
+			globaljson = json;
 		} 
 		
 		addMarkers(locations, map, infoWin);
@@ -121,18 +125,81 @@ function addMarkers(){
 
 
 function show_noticias(index){
-
-	alert(index);
-
-	/*for (var i = 0; i < json.length; i++) { 					//Recorrer array principal
-		var data   = json[i],
-		    latLng = new google.maps.LatLng(data[0].LATITUD, data[0].LONGITUD);
+	var data   = globaljson[index];
 	
-		/*for (var j = 0; j < data.length; j++) {				//Recorrer subarrays(los agrupados por ubicacion)
-			//console.log(data[j].UBICACION);
+
+	//Limpiar div y borrar su contenido	
+	document.getElementById("content_d2b1").innerHTML ='';
+	
+
+	//Establecer titulo 
+	var div_title = '<div id="" class="container">'+
+				'<div class="row">'+
+					'<h4>'+data[0].UBICACION+'</h4>'+
+				'</div>'+
+			'</div>';
+	document.getElementById("content_d2b1").innerHTML += div_title;
+
+
+	//Establecer noticias
+	var div_news = '<div class="container"><div class="row">';
+	for (var j = 0; j < data.length; j++) {			
+					
+		div_news += '<p>'+data[j].TITULO+'</p>';
 		
-		}
-	}*/
+	}
+	div_news += '</div></div>';
+	document.getElementById("content_d2b1").innerHTML += div_news;
 }
+
+
+function goRight(){
+	var initalLeftMargin = $( ".column-left" ).css('margin-left').replace("px", "")*1;
+	var widthDiv = document.getElementById('div_box').offsetWidth;
+
+	var newLeftMargin = (initalLeftMargin - widthDiv); 
+	$( ".column-left" ).animate({marginLeft: newLeftMargin}, 500);
+}
+
+
+function goLeft(){ 
+	var initalLeftMargin = $( ".column-left" ).css('margin-left').replace("px", "")*1;
+	var widthDiv2 = document.getElementById('div_box2').offsetWidth;
+
+	var newLeftMargin = (initalLeftMargin + widthDiv2); 
+	$( ".column-left" ).animate({marginLeft: newLeftMargin}, 500);
+}
+
+
+var openDiv;
+function toggleDiv(divID) {
+    $("#" + divID).fadeToggle(400, function() {
+        openDiv = $(this).is(':visible') ? divID : null;
+    });
+}
+
+
+
+
+/*Llamadas a funciones*/
+$(document).click(function(e) {
+    if (!$(e.target).closest('#'+openDiv).length) {
+        toggleDiv(openDiv);
+    }
+});
+
+
+$( ".nextBtn" ).click(function(e) {
+	goRight();
+});
+    
+
+
+$( ".backBtn" ).click(function(e) {
+	goLeft();
+});
+
+
+
 
 
