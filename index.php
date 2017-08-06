@@ -21,20 +21,20 @@
 	<body>
 		<div class="container-fluid">
 			<div id ="menu" class="row">
-				<div class="col-md-12">
+				<div class="col-xs-12">
 					hola header
 				</div>
 			</div>
 			<div class="row fill-height">
-				<div class="mycontainer col-md-3">
+				<div id="mycontainer" class="mycontainer col-xs-3">
 					<div class="column-left row">
 						<div id="div_box" class="box">
 							<div id="d1b" class="container-fluid">
 								<div class="row vertical_center">
-									<div id="title_d1b" class="col-md-9">
+									<div id="title_d1b" class="col-xs-9">
 										<h2>Noticias</h2>
 									</div>
-									<div id="btn_d1b" class="col-md-3">
+									<div id="btn_d1b" class="col-xs-3">
 										<div class="div_img"> 
 											<input onclick="toggleDiv('option_box_div');" 
 												class="open_option_div" 
@@ -46,15 +46,15 @@
 								</div>
 							</div>
 							<div id="d2b" class="container">
-								<div class="row">
-									<div id="content_d2b1" class="col-md-12">
-											
+								<div id="d2b_divrow" class="row vertical_center horizontal_center">
+									<div id="content_d2b1" class="col-xs-12">
+										<p>Selecciona una ubicacion en el mapa</p>
 									</div>
 								</div>
 							</div>	
 							<div id="d3b" class="container-fluid">
 								<div class="row vertical_center horizontal_center footer_box">
-									<div  class="col-md-12">
+									<div  class="col-xs-12">
 										<p>Santa Cruz de Tenerife y San Cristobal de La Laguna</p>
 									</div>
 								</div>
@@ -64,10 +64,10 @@
 						<div id="div_box2" class="box box2">
 							<div id="d1b2" class="container-fluid">
 								<div class="row vertical_center">
-									<div id="title_d1b2" class="col-md-9">
+									<div id="title_d1b2" class="col-xs-9">
 										<h2 >Noticias</h2>
 									</div>
-									<div id="btn_d1b2" class="col-md-3">
+									<div id="btn_d1b2" class="col-xs-3">
 										<div class="div_img"> 
 											<input onclick="toggleDiv('option_box_div');" 
 												class="open_option_div" 
@@ -80,14 +80,14 @@
 							</div>
 							<div id="d2b2" class="container">
 								<div class="row">
-									<div id="content_d2b2" class="col-md-12 ">
-										<input class="backBtn" type="button" value="Back">
+									<div id="content_d2b2" class="col-xs-12 ">
+
 									</div>
 								</div>
 							</div>
 							<div id="d3b2" class="container-fluid">
 								<div class="row vertical_center horizontal_center footer_box">
-									<div class="col-md-12">
+									<div class="col-xs-12">
 										<p>Santa Cruz de Tenerife y San Cristobal de La Laguna</p>
 									</div>
 								</div>
@@ -97,10 +97,10 @@
 				</div>
 
 
-				<div id="map" class="col-md-9"></div>
+				<div id="map" class="col-xs-9"></div>
 			</div>
 			<div id="footer" class="row">
-				<div class="col-md-12">
+				<div class="col-xs-12">
 					hola footer
 				</div>
 			</div>
