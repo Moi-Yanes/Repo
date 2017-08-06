@@ -17,7 +17,7 @@
 
 		<link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 		<link type="text/css" rel="stylesheet" href="<?php echo SERVER_PATH; ?>bootstrap-3.3.7-dist/css/style.css">
-		
+		<link type="text/css" rel="stylesheet" href='//netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css'>
 	</head>
 	<body>
 		<div class="container-fluid">
@@ -100,18 +100,64 @@
 
 				<div id="map" class="col-xs-9"></div>
 			</div>
-			<div id="footer" class="row">
-				<div class="col-xs-12">
-					hola footer
-				</div>
-			</div>
-			
 		</div>
 
+		<footer style="margin-top:-50px!important;" class="nb-footer">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="about">
+							<img src="images/logo.png" class="img-responsive center-block" alt="">
+							<p>
+								Trabajo de Fin de Grado de Ingeniería Informática sobre Big Data.<br>
+								El trabajo consiste en una pagina web que sirve de clasificador de noticias. Las noticias a clasificar
+								corresponden a las zonas de Santa Cruz de Tenerife y San Cristobal de La Laguna.
+							</p>
+
+							<div class="social-media">
+								<ul class="list-inline">
+									<li><a href="#" title=""><i class="fa fa-facebook"></i></a></li>
+									<li><a href="#" title=""><i class="fa fa-github"></i></a></li>
+									<li><a href="#" title=""><i class="fa fa-google-plus"></i></a></li>
+									<li><a href="#" title=""><i class="fa fa-linkedin"></i></a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<section class="copyright">
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-6">
+							<p>Copyright © 2017. Design by Moisés Yanes</p>
+						</div>
+						<div class="col-sm-6"></div>
+					</div>
+				</div>
+			</section>
+		</footer>
+
+
 		<!-- div de opciones de los box da igual donde se ponga(position absolute)-->
-		<div id="option_box_div" class=""> 
-			<div id="option_box_div_2" class=""> 
-				bla
+		<div id="option_box_div" class="container"> 
+			<div id="option_box_div_2" class="row"> 
+				<div style="" class="list-group">
+					<a href="#" onclick="cerrarLeyenda();" class="list-group-item active">Ocultar leyenda del mapa</a>
+					<a href="#" onclick="descargarNews();" class="list-group-item">Descargar noticias de esta ubicación</a>
+					<a href="#" onclick="addFavoritos();" class="list-group-item">Añadir ubicación a favoritos</a>
+					<a href="#" onclick="" class="list-group-item">Si lo has leido todo esq te ha gustao</a>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- div para volver a mostrar la leyenda-->
+		<div id="leyenda_div" class=""> 
+			<div id="leyenda_div2" class=""> 
+				<div id="leyenda_div3" class=""> 
+					<span onclick="abrirLeyenda();" class="">Leyenda del mapa</span>
+				</div>
 			</div>
 		</div>
 

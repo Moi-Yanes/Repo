@@ -6,15 +6,17 @@ html, body, .container-fluid, #map {
 	height:100%;
 	color: black;
 	font: normal 15px arial,sans-serif;
-
+	font-family: Roboto,Arial,sans-serif;
 }
 
 .fill-height{
-	height: calc(100% - 70px); /*quitar a la fila del centro el tamaño del header y del footer*/
+	height: calc(100% - 100px); /*quitar a la fila del centro el tamaño del header y del footer*/
 }
 
 #map {
 	height: 100%;
+	max-width: none;
+	
 	/*padding-left: -15px!important;
 	margin-left: 0px!important;
 	margin-right: 0px!important;*/
@@ -67,7 +69,7 @@ html, body, .container-fluid, #map {
 
 .mycontainer{
 	white-space: nowrap;
-	/*overflow:scroll;*/
+	overflow:scroll;
 	overflow-y: hidden;
 	overflow-x: hidden;
 	height: 100%;
@@ -115,6 +117,11 @@ html, body, .container-fluid, #map {
 }
 
 
+#btn_d1b{
+	float:right;
+}
+
+
 #d2b, #d2b2{
 	overflow:scroll;
 	overflow-x:hidden;
@@ -157,14 +164,13 @@ html, body, .container-fluid, #map {
 #option_box_div{
 	background-color: #ffffff;
 	position: absolute; 
-	left: 352px; 
-	top: 60px;
-	width: 240px; 
-	height: 300px; 
-	min-width: 240px; 
-	min-height: 300px;
+	top: 64px;
+	width: 280px; 
+	height: auto; 
+	min-width: 280px; 
+	min-height: auto;
 	display:none;
-	max-width: 256px; 
+	max-width: 280px; 
 	max-height: 312px; 
 	overflow-x: hidden;
 	overflow-y: auto;
@@ -178,27 +184,97 @@ html, body, .container-fluid, #map {
 }
 
 #option_box_div_2{
-	width: 256px;
+	width: 280px;
 	height: auto;
-	min-width: 256px;
+	min-width: 280px;
 	float: left;
 	padding: 16px 0;
 }
 
 
+.list-group{
+	max-width: 100%; 
+	width: 100%; 
+	margin-bottom:0px;
+}
 
-.open_option_div{
-	
+.list-group-item{
+	border-top-left-radius: 0px !important;
+	border-top-right-radius: 0px!important;
+}
+
+.list-group-item:last-child {
+	margin-bottom: 0;
+	border-bottom-right-radius: 0px!important;
+	border-bottom-left-radius: 0px!important;
+}
+
+
+.open_option_div{	
 	height:45px;
 	width:45px;
 }
 
 .div_img{
+	float:right;
 	border-radius: 50%;
 	margin-left:15%;
 	height:45px;
 	width:45px;
 	text-align:center;
+}
+
+#leyenda_div{
+	display: none;
+	z-index: 0;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	margin-left: 16px;
+	margin-top: 68px;
+	background-color: white;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	padding: 3px 8px 0 8px;
+	-moz-box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+#leyenda_div2{
+	color: #4285f4;
+	line-height: 46px;
+	min-width: 88px;
+	-moz-user-select: none;
+	-moz-transition: background .2s .1s;
+	transition: background .2s .1s;
+	border: 0;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 14px;
+	font-weight: 500;
+	outline: none;
+	overflow: hidden;
+	position: relative;
+	text-align: center;
+	text-transform: uppercase;
+	z-index: 0;
+}
+
+#leyenda_div3{
+	top: 25px;
+	left: 114px;
+	width: 146px;
+	height: 42px;
+}
+
+
+#leyenda_div3:hover{
+	background-color:#f7f8f9;
+}
+#leyenda_div:hover{
+	background-color:#e6eaee;
 }
 
 
@@ -279,13 +355,97 @@ html, body, .container-fluid, #map {
 }
 
 
+
+
 /* FOOTER */
 #footer {
 	height:20px;
 }
 
 
+footer.nb-footer {
+	background: #222;
+	border-top: 4px solid #b78c33; 
+}
 
+footer.nb-footer .about {
+	margin: 0 auto;
+	margin-top: 40px;
+	max-width: 1170px;
+	text-align: center; 
+}
+
+footer.nb-footer .about p {
+	font-size: 13px;
+	color: #999;
+	margin-top: 30px; 
+}
+
+
+footer.nb-footer .about .social-media {
+	margin-top: 15px; 
+}
+
+
+footer.nb-footer .about .social-media ul li a {
+	display: inline-block;
+	width: 45px;
+	height: 45px;
+	line-height: 45px;
+	border-radius: 50%;
+	font-size: 16px;
+	color: #b78c33;
+	border: 1px solid rgba(255, 255, 255, 0.3); 
+}
+
+
+footer.nb-footer .about .social-media ul li a:hover {
+	background: #b78c33;
+	color: #fff;
+	border-color: #b78c33; 
+}
+
+
+footer.nb-footer .footer-info-single {
+	margin-top: 30px; 
+}
+
+
+footer.nb-footer .footer-info-single .title {
+	color: #aaa;
+	text-transform: uppercase;
+	font-size: 16px;
+	border-left: 4px solid #b78c33;
+	padding-left: 5px; 
+}
+
+footer.nb-footer .footer-info-single ul li a {
+	display: block;
+	color: #aaa;
+	padding: 2px 0; 
+}
+
+footer.nb-footer .footer-info-single ul li a:hover {
+	color: #b78c33; 
+}
+
+footer.nb-footer .footer-info-single p {
+	font-size: 13px;
+	line-height: 20px;
+	color: #aaa; 
+}
+
+footer.nb-footer .copyright {
+	margin-top: 15px;
+	background: #111;
+	padding: 7px 0;
+	color: #999; 
+}
+
+footer.nb-footer .copyright p {
+	margin: 0;
+	padding: 0; 
+}
 
 
 

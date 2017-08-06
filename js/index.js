@@ -1,13 +1,15 @@
 
 
 //INICIALIZAR MAPA CREANDO EL ARRAY DE LOCALIZACIONES
-var globaljson;
+var globaljson; var map;
 function initMap() {
 
-	var map = new google.maps.Map(document.getElementById('map'), {
+	map = new google.maps.Map(document.getElementById('map'), {
 	  center: {lat: 28.463938, lng: -16.262598}, //(Y,X)Sta Cruz de Tenerife
-	  zoom: 12
+	  zoom: 12,
+	  mapTypeControl: false
 	});
+
 
 	var infoWin = new google.maps.InfoWindow();
 
@@ -28,7 +30,7 @@ function initMap() {
 						'<h1 id="firstHeading" class="firstHeading">'+data[0].UBICACION+'</h1>'+
 						'<div id="bodyContent">'+
 							'<p><b>'+data[0].UBICACION+'</b>, haciendo click en el boton siguiente podras acceder a todas las noticias de este sitio: </p><br>'+
-							'<input type="button" value="Ver" onclick="show_noticias('+i+')">'+
+							'<input id="btnver" type="button" value="Ver" onclick="show_noticias('+i+')">'+
 						'</div>'+
 					    '</div>';
 
@@ -39,6 +41,7 @@ function initMap() {
 		addMarkers(locations, map, infoWin);
 	});
 }
+
 
 
 //AÑADIR MARCADORES AGRUPADOS EN CLUSTERES
@@ -72,7 +75,13 @@ function addMarkers(locations, map, infoWin){
 
 function show_noticias(index){
 	var data   = globaljson[index];
-	console.log(data);
+
+
+	//Si esta visible el box2 desplazarnos a la izq
+	if (boxVisible("div_box2") == true){
+		goLeft(index);
+	}
+	
 
 	//Limpiar div y borrar su contenido	
 	document.getElementById("content_d2b1").innerHTML ='';
@@ -120,17 +129,10 @@ function show_noticias(index){
 //FUNCION PARA MOVERSE DEL BOX1 AL BOX2
 function goRight(index, i){
 	var data   = globaljson[index][i];
-	//console.log(data);
+	
 
 	//Limpiar div y borrar su contenido	
 	document.getElementById("content_d2b2").innerHTML ='';
-
-	//Agrandar box2 y reducir mapa
-	/*$("#mycontainer").removeClass("col-md-3");
-	$("#map").removeClass("col-md-9");
-
-	$("#mycontainer").addClass("col-md-5");
-	$("#map").addClass("col-md-7");*/
 
 
 	/* Añadir los datos de una noticia en concreto al box2 */
@@ -187,7 +189,7 @@ function goRight(index, i){
 		    	'</div>'+	
 			'<div style="margin-top:50px; margin-bottom:50px;" class="row padding_row horizontal_center">'+
 		    		'<div class="col-xs-12">'+
-					'<img onclick="goLeft('+index+');" class="img_derecha" src="http://localhost/TFG/images/flecha.png"/>'+
+					'<img onclick="show_noticias('+index+');" class="img_derecha" src="http://localhost/TFG/images/flecha.png"/>'+
 				'</div>'+
 		    	'</div>';
 			
@@ -203,20 +205,9 @@ function goRight(index, i){
 }
 
 
+
 //FUNCION PARA MOVERSE DEL BOX2 AL BOX1	
-function goLeft(index){ 
-
-	//Llama a show_noticias para que muestre todas las noticias para la ubicacion escogida previamente, es decir, vuelves al box1 y se muestran las mismas noticias q antes
-	show_noticias(index);
-
-	//Agrandar box2 y reducir mapa
-	/*$("#mycontainer").removeClass("col-md-5");
-	$("#map").removeClass("col-md-7");
-
-	$("#mycontainer").addClass("col-md-3");	
-	$("#map").addClass("col-md-9");*/
-
-	
+function goLeft(index){ 	
 
 	//Desplazarnos al box1
 	var initalLeftMargin = $( ".column-left" ).css('margin-left').replace("px", "")*1;
@@ -231,6 +222,9 @@ function goLeft(index){
 //FUNCION PARA MOSTRAR EL DIV DE OPCIONES DE LOS BOX
 var openDiv;
 function toggleDiv(divID) {
+
+	var mycontainerWidth = document.getElementById('mycontainer').offsetWidth;
+	document.getElementById('option_box_div').style.marginLeft = (mycontainerWidth-62)+'px';
 
 	//fade div
 	$("#" + divID).fadeToggle(400, function() {
@@ -251,7 +245,88 @@ function reducirTitulo(str){
 
 
 
+//FUNCION PARA COMPROBAR SI UN BOX ESTA VISIBLE O SI ESTA OCULTO TRAS EL MAPA
+function boxVisible(id) {
+	var visible = true;
+	var box = $((document.getElementById(id)));
+	var map = $((document.getElementById("map")));
+
+	var mapLeft = map.offset().left;
+	var mapRight = ($(window).width() - (mapLeft + map.outerWidth())); //calcular margin-right
+
+	var boxLeft = box.offset().left;
+	var boxRight = ($(window).width() - (boxLeft + box.outerWidth())); //calcular margin-right
+	
+	//console.log(boxLeft + " : " + mapLeft);
+	//console.log(boxRight + " : " + mapRight);
+	
+	if (boxLeft >= mapLeft || boxRight <= mapRight) {		   //Si el box esta "dentro/detras" del map
+		visible = false;
+	}
+	return visible;
+}
+
+
+
+
+function cerrarLeyenda(){
+
+	//Poner el div del mapa a pantalla completa
+	$("#map").removeClass("col-xs-9");
+	$("#map").addClass("col-xs-12");
+	
+	//Ocultar option box div
+	toggleDiv('option_box_div');
+
+	//Redimensionar y centrar mapa
+	var center = map.getCenter();
+	google.maps.event.trigger(map, "resize");
+	map.setCenter(center); 
+
+
+	//Ocultar container de boxs y mostrar divleyenda
+	$("#leyenda_div").show();
+	$("#mycontainer").hide();
+	
+}
+
+
+
+function abrirLeyenda(){
+
+	//Poner el div del mapa en su posicion inicial
+	$("#map").removeClass("col-xs-12");
+	$("#map").addClass("col-xs-9");
+	
+	//Ocultar option box div
+	//toggleDiv('option_box_div');
+
+	//Redimensionar y centrar mapa
+	var center = map.getCenter();
+	google.maps.event.trigger(map, "resize");
+	map.setCenter(center); 
+
+
+	//Ocultar container de boxs y mostrar divleyenda
+	$("#leyenda_div").hide();
+	$("#mycontainer").show();
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
 /*Llamadas a funciones*/
+
+//Cuando se haga clic en cualquier parte del documento que no sea el option box se llama a la funcion toogle para cerrar el option box si esta abierto
 $(document).click(function(e) {
 	if (!$(e.target).closest('#'+openDiv).length) {
 		toggleDiv(openDiv);
@@ -259,6 +334,13 @@ $(document).click(function(e) {
 });
 
 
+
+//Recalcular margen en option box div cada vez que se redimencione la pantalla
+$(window).resize(function(){
+
+   	var mycontainerWidth = document.getElementById('mycontainer').offsetWidth;
+	document.getElementById('option_box_div').style.marginLeft = (mycontainerWidth-62)+'px';
+})
 
 
 
