@@ -1,17 +1,18 @@
-
+/*variables globales*/
+var globaljson; var map; var allMarkers = []; var infoWin;
+var ubicacion_actual;
 
 //INICIALIZAR MAPA CREANDO EL ARRAY DE LOCALIZACIONES
-var globaljson; var map;
 function initMap() {
 
 	map = new google.maps.Map(document.getElementById('map'), {
-	  center: {lat: 28.463938, lng: -16.262598}, //(Y,X)Sta Cruz de Tenerife
-	  zoom: 12,
+	  center: {lat: 28.48, lng: -16.32}, //(Y,X)la laguna
+	  zoom: 11,
 	  mapTypeControl: false
 	});
 
 
-	var infoWin = new google.maps.InfoWindow();
+	 infoWin = new google.maps.InfoWindow();
 
 	 //Obtenemos json con noticias agrupadas por ubicacion. Tenemos un array de arrays de tal forma que:
 	 /*
@@ -34,7 +35,7 @@ function initMap() {
 						'</div>'+
 					    '</div>';
 
-			locations.push({'lat' : parseFloat(data[0].LATITUD), 'lng': parseFloat(data[0].LONGITUD), 'info':  contentString});
+			locations.push({'lat' : parseFloat(data[0].LATITUD), 'lng': parseFloat(data[0].LONGITUD), 'info':  contentString, 'ubicacion':  data[0].UBICACION});
 			globaljson = json;
 		} 
 		
@@ -48,18 +49,18 @@ function initMap() {
 function addMarkers(locations, map, infoWin){
 
 	
-	// Add some markers to the map.
-	// Note: The code uses the JavaScript Array.prototype.map() method to
-	// create an array of markers based on a given "locations" array.
-	// The map() method here has nothing to do with the Google Maps API.
+	// Añadir tantos marcadores como posiciones tenga el array locations (funcion map de arrays)
 	var markers = locations.map(function(location, i) {
 		var marker = new google.maps.Marker({
-			position: location
+			position: location,
+			ubicacion: location.ubicacion
 		});
 		google.maps.event.addListener(marker, 'click', function(evt) {
 			infoWin.setContent(location.info);
 			infoWin.open(map, marker);
 		})
+
+		allMarkers.push(marker);
 		return marker;
 	});
 
@@ -74,7 +75,12 @@ function addMarkers(locations, map, infoWin){
 
 
 function show_noticias(index){
-	var data   = globaljson[index];
+	var data   	 = globaljson[index];	//contiene el json en la posicion[index]
+	ubicacion_actual = data; 		//para saber que noticias tenemos en ventana en cada momento
+
+
+	//cerrar todos los infowindown q hayan abiertos, en nuestro caso sera unicamente uno
+	infoWin.close();
 
 
 	//Si esta visible el box2 desplazarnos a la izq
@@ -111,7 +117,7 @@ function show_noticias(index){
 		else{		
 			div_news += '<div class="row padding_row">';
 		}
-		div_news += '<div class="col-md-12">'+
+		div_news += '<div class="col-md-12 horizontal_center calc_tam">'+
 				'<div class="div_img_izq"><img class="img_izquierda" src="http://localhost/TFG/images/marker_transparent.png"/></div>'+
 				'<div class="div_parrafo"><p class="parrafo">'+reducirTitulo(data[j].TITULO)+'</p></div>'+
 				'<div title="Consultar noticia" class="div_img_de">'+
@@ -233,14 +239,33 @@ function toggleDiv(divID) {
 }
 
 
+function pad(input, length, padding) { 
+	var str = input + "";
+	return (length <= str.length) ? str : pad(str+padding, length, padding);
+}
+
 
 //FUNCION PARA ACORTAR LA LONGITUD DE UNA CADENA
 function reducirTitulo(str){
-	var leng = 30;
-	
-	str = str.slice(0, leng);
-	str = str + " ...";
-	return str;
+	var leng = 37;
+	var strnew;
+	str = str.trim();
+	//var leng = document.getElementsByClassName('calc_tam')[0].offsetWidth;
+	//console.log(leng);
+
+	if(str.length < leng){
+		strnew = pad(str,(leng-4)," ");
+		strnew = strnew + " ...";
+	}
+	else if(str.length > leng){
+		strnew = str.substr(0,(leng-4));
+		strnew = strnew + " ...";
+	}
+	else if(str.length == leng){
+		strnew = str;
+	}
+	console.log(strnew + " Tamaño: " +strnew.length);
+	return strnew;
 }
 
 
@@ -257,8 +282,6 @@ function boxVisible(id) {
 	var boxLeft = box.offset().left;
 	var boxRight = ($(window).width() - (boxLeft + box.outerWidth())); //calcular margin-right
 	
-	//console.log(boxLeft + " : " + mapLeft);
-	//console.log(boxRight + " : " + mapRight);
 	
 	if (boxLeft >= mapLeft || boxRight <= mapRight) {		   //Si el box esta "dentro/detras" del map
 		visible = false;
@@ -278,16 +301,18 @@ function cerrarLeyenda(){
 	//Ocultar option box div
 	toggleDiv('option_box_div');
 
-	//Redimensionar y centrar mapa
-	var center = map.getCenter();
-	google.maps.event.trigger(map, "resize");
-	map.setCenter(center); 
-
+	//Mover busqueda box
+	document.getElementById('box_busqueda').style.marginLeft = '180px';
+	document.getElementById('box_busqueda').style.marginTop = '25px';
 
 	//Ocultar container de boxs y mostrar divleyenda
 	$("#leyenda_div").show();
 	$("#mycontainer").hide();
-	
+
+	//Redimensionar y centrar mapa
+	map.setZoom(12);
+	google.maps.event.trigger(map, "resize");
+	map.setCenter({lat: 28.48, lng: -16.32}); 
 }
 
 
@@ -297,50 +322,228 @@ function abrirLeyenda(){
 	//Poner el div del mapa en su posicion inicial
 	$("#map").removeClass("col-xs-12");
 	$("#map").addClass("col-xs-9");
-	
-	//Ocultar option box div
-	//toggleDiv('option_box_div');
 
-	//Redimensionar y centrar mapa
-	var center = map.getCenter();
-	google.maps.event.trigger(map, "resize");
-	map.setCenter(center); 
-
+	//Mover busqueda box
+	document.getElementById('box_busqueda').style.marginLeft = '25%';
+	document.getElementById('box_busqueda').style.marginTop = '20px';
 
 	//Ocultar container de boxs y mostrar divleyenda
 	$("#leyenda_div").hide();
 	$("#mycontainer").show();
-	
+
+	//Redimensionar y centrar mapa
+	map.setZoom(11);
+	//var center = map.getCenter();
+	google.maps.event.trigger(map, "resize");
+	map.setCenter({lat: 28.48, lng: -16.32}); 
 }
 
 
 
+function centrarMapa(ubicacion){
+
+	//ocultar div de resultados	
+	$('#busqueda_result').hide('slow');	 
+
+	//buscar posiciones y centrar mapa
+	for (var i = 0; i < globaljson.length; i++) { 					
+		var data= globaljson[i];
+		var str = data[0].UBICACION;
+		
+		if( str == ubicacion ){
+			map.setCenter(new google.maps.LatLng(data[0].LATITUD,data[0].LONGITUD));
+			map.setZoom(20);
+			/*for (var i = 0; i < allMarkers.length; i++) {
+				if( allMarkers[i].ubicacion == data[0].UBICACION  ){
+					new google.maps.Circle({
+						strokeColor: '#FF0000',
+						strokeOpacity: 0.8,
+						strokeWeight: 2,
+						fillColor: '#FF0000',
+						fillOpacity: 0.35,
+						map: map,
+						center: {lat: allMarkers[i].getPosition().lat(), lng: allMarkers[i].getPosition().lng()},
+						radius: Math.sqrt(0.01) * 100
+					});
+				}
+			}*/	
+		}
+	}  
+}
+
+
+function descargarNews(){
+
+	//ocultar option box div, puesto que si se llama a esta funcion es pq ya se ha pulsado sobre una opcion
+	toggleDiv('option_box_div');
+
+	//descargar fichero
+	if(ubicacion_actual == undefined){
+		alert("Seleccione una ubicación primero en el mapa");
+	}
+	else{
+		$.ajax({
+			url     : 'http://localhost/TFG/php/downloadfile.php?file=downloadfile.json&opcion=1',
+			method  : 'post',
+			data	: {json : JSON.stringify(ubicacion_actual)},			   //pasar el array de objetos de las noticias a php y que este rellene el fichero json
+			success:function(data, textStatus, jqXHR){
+				console.log('AJAX SUCCESS');
+				window.location.href = "http://localhost/TFG/php/downloadfile.php?file=downloadfile.json&opcion=1";//para que se lleve a cabo la descarga
+			}, 
+			complete : function(data, textStatus, jqXHR){
+				console.log('AJAX COMPLETE');
+			}
+		});
+	}
+}
+
+function descargarNewsTxt(){
+
+	//ocultar option box div, puesto que si se llama a esta funcion es pq ya se ha pulsado sobre una opcion
+	toggleDiv('option_box_div');
+
+	//descargar fichero
+	if(ubicacion_actual == undefined){
+		alert("Seleccione una ubicación primero en el mapa");
+	}
+	else{
+		$.ajax({
+			url     : 'http://localhost/TFG/php/downloadfile.php?file=downloadfile.txt&opcion=2',
+			method  : 'post',
+			data	: {txt : ubicacion_actual},		//pasar el array de objetos de las noticias a php y que este rellene el fichero txt
+			success:function(data, textStatus, jqXHR){
+				console.log('AJAX SUCCESS');
+				window.location.href = "http://localhost/TFG/php/downloadfile.php?file=downloadfile.txt&opcion=2";//para que se lleve a cabo la descarga
+			}, 
+			complete : function(data, textStatus, jqXHR){
+				console.log('AJAX COMPLETE');
+			}
+		});
+	}
+}
 
 
 
+function descargarNewsPdf(){
+
+	//ocultar option box div, puesto que si se llama a esta funcion es pq ya se ha pulsado sobre una opcion
+	toggleDiv('option_box_div');
+
+	//descargar fichero
+	if(ubicacion_actual == undefined){
+		alert("Seleccione una ubicación primero en el mapa");
+	}
+	else{
+		$.ajax({
+			url     : 'http://localhost/TFG/php/txttopdf.php',
+			method  : 'post',
+			data	: {pdf : ubicacion_actual},		//pasar el array de objetos de las noticias a php y que este rellene el fichero txt
+			success:function(data, textStatus, jqXHR){
+				console.log('AJAX SUCCESS');
+				window.open("http://localhost/TFG/dump/downloadfile.pdf","_blank");
+			}, 
+			complete : function(data, textStatus, jqXHR){
+				console.log('AJAX COMPLETE');
+			}
+		});
+	}
+}
 
 
+
+//Listar las ubicaciones posibles a medida que se introducen letras en el campo de busqueda
+function buscarUbicacion(){
+	var consulta;
+                                                                          
+	//hacemos focus al campo de búsqueda
+	$('#busqueda').click( function (){
+		$("#busqueda").focus();
+	});	
+
+                                                                                                    
+	//comprobamos si se pulsa una tecla
+	$("#busqueda").keyup(function(e){
+                  
+		//limpiar div de resultados	
+            	document.getElementById('busqueda_result').innerHTML = "";
+
+		//obtenemos el texto introducido en el campo de búsqueda
+		consulta 	= $("#busqueda").val().toUpperCase();
+		var re 		= new RegExp(consulta, 'g');
+                var array 	= new Array();
+                             
+                         
+              	//hacemos la búsqueda                                                                
+	  	for (var i = 0; i < globaljson.length; i++) { 					
+			var data= globaljson[i];
+			var str = data[0].UBICACION;
+		
+			if( str.match(re) ){
+				array.push(str);	
+			}
+		}  
+
+		//recorremos el array y creamos un div que contenga todos los resultados
+		var div_new = '';
+		for (var i = 0; i < array.length; i++) {
+			div_new += '<div class="parrafo_result vertical_center"><p onclick="centrarMapa(`'+array[i]+'`);" style="margin-top: 10px!important;">'+array[i]+'</p></div>';
+		}
+		
+		//insertamos div 
+		document.getElementById('busqueda_result').innerHTML += div_new;
+		$('#busqueda_result').appendTo('#box_busqueda').show('slow');	 
+	}); 
+
+}
 
 
 
 
 /*Llamadas a funciones*/
 
-//Cuando se haga clic en cualquier parte del documento que no sea el option box se llama a la funcion toogle para cerrar el option box si esta abierto
+//Cuando se haga clic en cualquier parte del documento 
 $(document).click(function(e) {
+
+	//Se llama a la funcion toogle para cerrar el option box si esta abierto
 	if (!$(e.target).closest('#'+openDiv).length) {
 		toggleDiv(openDiv);
+	}
+
+	//si el div de resultados de busqueda esta abierto, cerrarlo
+	if(!$(e.target).closest('#busqueda_result').length){
+		$('#busqueda_result').hide('slow');
+		document.getElementById('busqueda').value = "";
 	}
 });
 
 
 
-//Recalcular margen en option box div cada vez que se redimencione la pantalla
+
 $(window).resize(function(){
 
+	//Recalcular margen en option box div cada vez que se redimencione la pantalla
    	var mycontainerWidth = document.getElementById('mycontainer').offsetWidth;
 	document.getElementById('option_box_div').style.marginLeft = (mycontainerWidth-62)+'px';
+
+
+	//centrar map
+	//var center = map.getCenter();
+	google.maps.event.trigger(map, "resize");
+	map.setCenter({lat: 28.48, lng: -16.32});
 })
+
+
+
+
+
+$(document).ready(function(){
+        buscarUbicacion();                        
+}); 
+
+
+
+
+
 
 
 

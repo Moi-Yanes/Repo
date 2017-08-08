@@ -278,17 +278,57 @@ html, body, .container-fluid, #map {
 }
 
 
+#box_busqueda{
+	width: 280px; 
+	height: auto; 
+	position: absolute;
+	margin-left: 25%; 
+	margin-top: 20px;
+	z-index: 1;
+}
+
+
+#busqueda{
+	width:280px; 
+	border-top-left-radius: 5px !important;
+	border-top-right-radius: 5px!important;
+	border-bottom-left-radius: 5px!important;
+	border-bottom-right-radius: 5px!important;
+}
+
+#busqueda_result{
+	background-color:#f7f8f9;
+	z-index: 1; 
+	margin-top:0px; 
+	max-height:100px; 
+	text-align:left; 
+	overflow:scroll; 
+	overflow-x:hidden; 
+	display:none;
+	width: 278px;
+	margin-left: -14px;
+}
+
+#busqueda_div_input{
+	z-index: 1;
+}
+
+h4{
+	font-size:17px;
+}
+
 /* Generadas con codigo javascript */
 .div_img_izq{
 	width: 55px;
 	height: 30px;
 	display: inline-block;
-	text-align:right;
+	/*text-align:right;*/
 	
 }
 
 .div_parrafo{
-	width: 270px;
+	width: 280px;
+	max-width: 280px;
 	height: 30px;
 	text-align:left;
 	margin-top: 10px!important;
@@ -299,7 +339,10 @@ html, body, .container-fluid, #map {
 	width: 55px;
 	height: 30px;
 	display: inline-block;	
-	position:absolute;
+	/*position:absolute;*/
+	margin-right: 15px;
+	margin-top: 4px;
+	text-align:center;
 }
 
 
@@ -311,6 +354,7 @@ html, body, .container-fluid, #map {
 
 .parrafo{	 
 	font-size: 17px;
+	max-width: 280px;
 }
 
 
@@ -336,7 +380,6 @@ html, body, .container-fluid, #map {
 
 
 .padding_row{
-	
 	padding-left:15px;
 }
 
@@ -353,6 +396,19 @@ html, body, .container-fluid, #map {
 	text-align: justify;
 	margin-right:15px;
 }
+
+
+.parrafo_result{
+	padding: 10px;
+	font-size: 11px;
+	height: 22px;	
+}
+
+.parrafo_result:hover{
+	background-color:#b78c33;
+	color: white;
+}
+
 
 
 

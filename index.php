@@ -21,11 +21,24 @@
 	</head>
 	<body>
 		<div class="container-fluid">
+
+	
 			<div id ="menu" class="row">
 				<div class="col-xs-12">
 					hola header
 				</div>
 			</div>
+
+			<!-- div de busqueda -->
+			<div id="box_busqueda" class="container-fluid">
+				<div id="busqueda_div_input" class="row input-group stylish-input-group">
+					<input id="busqueda" type="text" class="form-control" placeholder="Busca una ubicacion concreta aquí"/>
+				</div>
+				<div id="busqueda_result" class="row">
+				</div>
+			</div>
+
+			<!-- CONTENIDO DE LA PAGINA -->
 			<div class="row fill-height">
 				<div id="mycontainer" class="mycontainer col-xs-3">
 					<div class="column-left row">
@@ -100,43 +113,49 @@
 
 				<div id="map" class="col-xs-9"></div>
 			</div>
-		</div>
+			
 
-		<footer style="margin-top:-50px!important;" class="nb-footer">
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-12">
-						<div class="about">
-							<img src="images/logo.png" class="img-responsive center-block" alt="">
-							<p>
-								Trabajo de Fin de Grado de Ingeniería Informática sobre Big Data.<br>
-								El trabajo consiste en una pagina web que sirve de clasificador de noticias. Las noticias a clasificar
-								corresponden a las zonas de Santa Cruz de Tenerife y San Cristobal de La Laguna.
-							</p>
+			<!-- FOOTER -->
+			<div class="row">
+				<footer class="nb-footer">
+					<div class="container">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="about">
+									<img src="images/logo.png" class="img-responsive center-block" alt="">
+									<p>
+										Trabajo de Fin de Grado de Ingeniería Informática sobre Big Data.<br>
+										El trabajo consiste en una pagina web que sirve de clasificador de noticias. Las noticias a clasificar
+										corresponden a las zonas de Santa Cruz de Tenerife y San Cristobal de La Laguna.
+									</p>
 
-							<div class="social-media">
-								<ul class="list-inline">
-									<li><a href="#" title=""><i class="fa fa-facebook"></i></a></li>
-									<li><a href="#" title=""><i class="fa fa-github"></i></a></li>
-									<li><a href="#" title=""><i class="fa fa-google-plus"></i></a></li>
-									<li><a href="#" title=""><i class="fa fa-linkedin"></i></a></li>
-								</ul>
+									<div class="social-media">
+										<ul class="list-inline">
+											<li><a href="#" title=""><i class="fa fa-facebook"></i></a></li>
+											<li><a href="#" title=""><i class="fa fa-github"></i></a></li>
+											<li><a href="#" title=""><i class="fa fa-google-plus"></i></a></li>
+											<li><a href="#" title=""><i class="fa fa-linkedin"></i></a></li>
+										</ul>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
-			<section class="copyright">
-				<div class="container">
-					<div class="row">
-						<div class="col-sm-6">
-							<p>Copyright © 2017. Design by Moisés Yanes</p>
+					<section class="copyright">
+						<div class="container">
+							<div class="row">
+								<div class="col-sm-6">
+									<p>Copyright © 2017. Design by Moisés Yanes</p>
+								</div>
+								<div class="col-sm-6"></div>
+							</div>
 						</div>
-						<div class="col-sm-6"></div>
-					</div>
-				</div>
-			</section>
-		</footer>
+					</section>
+				</footer>
+			</div>
+		</div>
+
+		
 
 
 		<!-- div de opciones de los box da igual donde se ponga(position absolute)-->
@@ -144,15 +163,16 @@
 			<div id="option_box_div_2" class="row"> 
 				<div style="" class="list-group">
 					<a href="#" onclick="cerrarLeyenda();" class="list-group-item active">Ocultar leyenda del mapa</a>
-					<a href="#" onclick="descargarNews();" class="list-group-item">Descargar noticias de esta ubicación</a>
+					<a href="#" onclick="descargarNews();" class="list-group-item">Descargar noticias de esta ubicación en json</a>
+					<a href="#" onclick="descargarNewsTxt();" class="list-group-item">Descargar noticias de esta ubicación en txt</a>
+					<a href="#" onclick="descargarNewsPdf();" class="list-group-item">Descargar noticias de esta ubicación en PdF</a>
 					<a href="#" onclick="addFavoritos();" class="list-group-item">Añadir ubicación a favoritos</a>
-					<a href="#" onclick="" class="list-group-item">Si lo has leido todo esq te ha gustao</a>
 				</div>
 			</div>
 		</div>
 
 
-		<!-- div para volver a mostrar la leyenda-->
+		<!-- div de la leyenda-->
 		<div id="leyenda_div" class=""> 
 			<div id="leyenda_div2" class=""> 
 				<div id="leyenda_div3" class=""> 
