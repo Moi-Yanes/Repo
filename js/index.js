@@ -435,7 +435,7 @@ function descargarNewsPdf(){
 	}
 	else{
 		$.ajax({
-			url     : 'http://localhost/TFG/php/txttopdf.php',
+			url     : 'http://localhost/TFG/php/downloadfilepdf.php',
 			method  : 'post',
 			data	: {pdf : ubicacion_actual},		//pasar el array de objetos de las noticias a php y que este rellene el fichero txt
 			success:function(data, textStatus, jqXHR){

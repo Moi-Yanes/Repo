@@ -166,7 +166,7 @@
 					<a href="#" onclick="descargarNews();" class="list-group-item">Descargar noticias de esta ubicación en json</a>
 					<a href="#" onclick="descargarNewsTxt();" class="list-group-item">Descargar noticias de esta ubicación en txt</a>
 					<a href="#" onclick="descargarNewsPdf();" class="list-group-item">Descargar noticias de esta ubicación en PdF</a>
-					<a href="#" onclick="addFavoritos();" class="list-group-item">Añadir ubicación a favoritos</a>
+					<!--<a href="#" onclick="addFavoritos();" class="list-group-item">Añadir ubicación a favoritos</a>-->
 				</div>
 			</div>
 		</div>

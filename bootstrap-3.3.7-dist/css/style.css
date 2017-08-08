@@ -165,12 +165,12 @@ html, body, .container-fluid, #map {
 	background-color: #ffffff;
 	position: absolute; 
 	top: 64px;
-	width: 280px; 
+	width: 335px; 
 	height: auto; 
 	min-width: 280px; 
 	min-height: auto;
 	display:none;
-	max-width: 280px; 
+	max-width: 335px; 
 	max-height: 312px; 
 	overflow-x: hidden;
 	overflow-y: auto;
@@ -184,7 +184,7 @@ html, body, .container-fluid, #map {
 }
 
 #option_box_div_2{
-	width: 280px;
+	width: 335px;
 	height: auto;
 	min-width: 280px;
 	float: left;
