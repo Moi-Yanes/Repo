@@ -59,6 +59,7 @@ function initMap() {
 		//Obtener ubicaciones de cada agrupacion de noticias para posteriormente agruparlas por cercania 
 		for (var i = 0; i < json.length; i++) { 					
 			var data   = json[i];
+
 			var contentString ='<div id="iw-container">'+
 						'<div class="iw-title">'+data[0].UBICACION+'</div>'+
 						'<div class="iw-content">'+
@@ -67,13 +68,13 @@ function initMap() {
 							'<p>Haciendo click en el boton siguiente podras acceder a todas las noticias de este sitio </p>'+
 						'</div>'+
 					   '</div>';
-			/*var contentString = '<div id="contentInfoWindow" class="container-fluid">'+
+					   /*var contentString = '<div id="contentInfoWindow" class="container-fluid">'+
 						'<h2 id="firstHeading" class="firstHeading">'+data[0].UBICACION+'</h2>'+
 						'<div id="bodyContent">'+
 							'<p><b>'+data[0].UBICACION+'</b>, haciendo click en el boton siguiente podras acceder a todas las noticias de este sitio: </p><br>'+
 							'<input id="btnver" type="button" value="Ver" onclick="show_noticias('+i+')">'+
 						'</div>'+
-					      '</div>';*/
+					   '</div>';*/
 
 			locations.push({'lat' : parseFloat(data[0].LATITUD), 'lng': parseFloat(data[0].LONGITUD), 'info':  contentString, 'ubicacion':  data[0].UBICACION});
 			globaljson = json;
@@ -221,7 +222,7 @@ function goRight(index, i){
 		    	'</div>'+
 			'<div class="row padding_row">'+
 		    		'<div class="col-xs-12 justify_text">'+
-					'<p>'+data.DESCRIPCION+'</p>'+
+					'<p class="p_descripcion">'+data.DESCRIPCION+'</p>'+
 				'</div>'+
 		    	'</div>'+
 			'<div class="row padding_row">'+

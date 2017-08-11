@@ -461,9 +461,11 @@ h5{
 }
 
 
-
-
-
+.p_descripcion a{
+	margin-top: 20px!important;
+	display: block;
+	text-align: center;
+}
 
 
 

@@ -87,7 +87,7 @@ if( isset($_POST['pdf']) ){
 		$pdf->Cell(80, 10, $col5, 0);
 		$pdf->Ln(10);
 		$pdf->SetFont('Helvetica','',12);
-		$col6=$r['DESCRIPCION'];
+		$col6=preg_replace('/<[\/\!]*?[^<>]*?>/si', '', $r['DESCRIPCION']);
 		$pdf->MultiCell(190, 7, $col6, 0);
 
 		$pdf->Ln(20);//salto de 5 lineas

@@ -41,7 +41,7 @@
 						//fwrite($fp, $_POST['json']);
 						fwrite($fp, "Periodico: ".$r['PERIODICO']."\tUbicacion: ".$r['UBICACION']."\tFecha: ".$r['FECHA']."\n"."\n");	
 						fwrite($fp, "Titulo"."\n".$r['TITULO']."\n"."\n");
-						fwrite($fp, "Descripcion"."\n".$r['DESCRIPCION']."\n"."\n");
+						fwrite($fp, "Descripcion"."\n".preg_replace('/<[\/\!]*?[^<>]*?>/si', '', $r['DESCRIPCION'])."\n"."\n");
 						fwrite($fp, "Link ".$r['LINK']."\n"."\n");	
 				}
 				fclose($fp);
