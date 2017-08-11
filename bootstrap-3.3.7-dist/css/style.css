@@ -535,13 +535,3 @@ footer.nb-footer .copyright p {
 
 
 
-@media screen and (max-width: 767px) { /*de 767 para abajo*/
-	#box_busqueda{
-		margin-left: 0px !important; 
-		margin-top: 670px;
-	}	
-}
-
-
-
-

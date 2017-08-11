@@ -339,7 +339,7 @@ function boxVisible(id) {
 function cerrarLeyenda(){
 
 	//Poner el div del mapa a pantalla completa
-	$("#map").removeClass("col-xs-9");
+	$("#map").removeClass("col-xs-12"); $("#map").removeClass("col-sm-6"); $("#map").removeClass("col-lg-8"); //col-xs-12 col-sm-6 col-lg-8
 	$("#map").addClass("col-xs-12");
 	
 	//Ocultar option box div
@@ -364,11 +364,12 @@ function cerrarLeyenda(){
 function abrirLeyenda(){
 
 	//Poner el div del mapa en su posicion inicial
-	$("#map").removeClass("col-xs-12");
-	$("#map").addClass("col-xs-9");
+	$("#map").removeClass("col-xs-12"); 
+	$("#map").addClass("col-xs-12"); $("#map").addClass("col-sm-6"); $("#map").addClass("col-lg-8"); //col-xs-12 col-sm-6 col-lg-8
 
 	//Mover busqueda box
-	document.getElementById('box_busqueda').style.marginLeft = '25%';
+	var mycontainerWidth = $('#mycontainer').outerWidth();	
+	document.getElementById('box_busqueda').style.marginLeft = (mycontainerWidth)+'px';
 	document.getElementById('box_busqueda').style.marginTop = '20px';
 
 	//Ocultar container de boxs y mostrar divleyenda
@@ -574,10 +575,14 @@ var ventana_ancho;
 var ventana_pequena = false;
 $(document).ready(function(){
         buscarUbicacion(); 
+	ventana_ancho = $(window).width();
+	ventana_alto  = $(window).height();
 
+ 
 	//calcular donde colocar el div de opciones
 	var mycontainerWidth = document.getElementById('mycontainer').offsetWidth;	
 	document.getElementById('box_busqueda').style.marginLeft = (mycontainerWidth)+'px';
+
 
 	//activar el scroll y en mycontainer
 	if(ventana_alto < 780 ){
@@ -585,11 +590,26 @@ $(document).ready(function(){
 		ventana_pequena = true;
 	}  
 
+	//Si se entra en la pagina con un tamaño pequeño
+	if(ventana_ancho <= 768){
+		var mapTop = $('#map').outerHeight();
+		document.getElementById('box_busqueda').style.marginTop = (mapTop + 20)+'px';
+		document.getElementById('box_busqueda').style.marginLeft = '0px';
+	}
 
-	ventana_ancho = $(window).width();
-	ventana_alto  = $(window).height(); 
-	
+
 	$(window).on('resize', function(){
+		
+		//Recalcular margen en option box div cada vez que se redimencione la pantalla
+	   	var mycontainerWidth = document.getElementById('mycontainer').offsetWidth;
+		document.getElementById('option_box_div').style.marginLeft = (mycontainerWidth-70)+'px';
+		
+
+		//centrar map
+		//var center = map.getCenter();
+		google.maps.event.trigger(map, "resize");
+		map.setCenter({lat: 28.48, lng: -16.32});
+
 
 		//redimension de alto
 		if($(this).height() != ventana_alto){
@@ -634,6 +654,7 @@ $(document).ready(function(){
 					}
 				}
 			}
+			
 		}
 
 
@@ -642,40 +663,29 @@ $(document).ready(function(){
 			var nuevo_ancho = $(window).width();
 			
 			if (boxVisible("div_box2") == true){
-			
 				var margin = $('#mycontainer').css("marginLeft").replace('px', '');
 				var width_column = document.getElementById('column-left').offsetWidth;
 				var margin_new = parseInt(margin) - width_column - 15;
-				//var new_margin = parseInt(margin) + 10;
 				document.getElementById('column-left').style.marginLeft = margin_new + 'px';
-				
+			}
+
+
+			if(nuevo_ancho <= 768 && $('#map').outerHeight()!= 0){
+				var mapTop = $('#map').outerHeight();
+				document.getElementById('box_busqueda').style.marginTop = (mapTop + 20)+'px';
+				document.getElementById('box_busqueda').style.marginLeft = '0px';
+			}
+			
+
+			//recolocar busqueda box cuando el mycontainer se este mostrando
+			if(boxVisible("mycontainer") == true){
+				var mycontainerWidth = $('#mycontainer').outerWidth();	
+				document.getElementById('box_busqueda').style.marginLeft = (mycontainerWidth)+'px';
+				document.getElementById('box_busqueda').style.marginTop = '20px';
 			}
 		}
 	}); 
 }); 
-
-
-
-
-$(window).resize(function(){
-
-
-	//Recalcular margen en option box div cada vez que se redimencione la pantalla
-   	var mycontainerWidth = document.getElementById('mycontainer').offsetWidth;
-	document.getElementById('option_box_div').style.marginLeft = (mycontainerWidth-70)+'px';
-	
-
-	//recolocar busqueda box
-	ventana_ancho_new = $(window).width();
-	if(ventana_ancho_new >= 768)
-		document.getElementById('box_busqueda').style.marginLeft = (mycontainerWidth)+'px';
-		
-
-	//centrar map
-	//var center = map.getCenter();
-	google.maps.event.trigger(map, "resize");
-	map.setCenter({lat: 28.48, lng: -16.32});
-})
 
 
 
