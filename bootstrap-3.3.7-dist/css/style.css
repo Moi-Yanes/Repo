@@ -1,25 +1,27 @@
 /*imports*/
 @import url('https://fonts.googleapis.com/css?family=Cinzel:700|Jura:500|Play');
+@import url('https://fonts.googleapis.com/css?family=Allan|Contrail+One|Kelly+Slab|Patrick+Hand|Share+Tech+Mono|Yanone+Kaffeesatz');
 
-
-html, body, .container-fluid, #map {
+html, body/*, .container-fluid, #map*/ {
 	height:100%;
 	color: black;
 	font: normal 15px arial,sans-serif;
 	font-family: Roboto,Arial,sans-serif;
 }
 
+#content_all{
+	height:100%;
+	/*overflow:scroll;*/
+}
+
 .fill-height{
-	height: calc(100% - 100px); /*quitar a la fila del centro el tamaño del header y del footer*/
+	height: calc(100% - 140px); /*quitar a la fila del centro el tamaño del footer*/
 }
 
 #map {
 	height: 100%;
 	max-width: none;
-	
-	/*padding-left: -15px!important;
-	margin-left: 0px!important;
-	margin-right: 0px!important;*/
+
 }
 
 
@@ -69,7 +71,7 @@ html, body, .container-fluid, #map {
 
 .mycontainer{
 	white-space: nowrap;
-	overflow:scroll;
+	/*overflow:scroll;*/
 	overflow-y: hidden;
 	overflow-x: hidden;
 	height: 100%;
@@ -95,11 +97,11 @@ html, body, .container-fluid, #map {
 
 
 #d1b, #d1b2{
-	height: 10%;
+	height: 10%/*70px*/;
 	min-height: 70px;
 	padding-left: 0px;
 	margin-left: 0px;
-	background-color: #db4437;
+	background-color: #337ab7/*#db4437*/;
 }
 
 #title_d1b, #title_d1b2 {
@@ -135,11 +137,11 @@ html, body, .container-fluid, #map {
 
 
 #d3b, #d3b2{
-	height: 7%;
+	height: 7%/*54px*/;
 	min-height: 54px;
 	padding-left: 0px;
 	margin-left: 0px;
-	background-color: #db4437;
+	background-color: #337ab7/*#db4437*/;
 }
 
 
@@ -164,7 +166,7 @@ html, body, .container-fluid, #map {
 #option_box_div{
 	background-color: #ffffff;
 	position: absolute; 
-	top: 64px;
+	top: 13px/*64px*/;
 	width: 335px; 
 	height: auto; 
 	min-width: 280px; 
@@ -200,13 +202,20 @@ html, body, .container-fluid, #map {
 
 .list-group-item{
 	border-top-left-radius: 0px !important;
-	border-top-right-radius: 0px!important;
+	border-top-right-radius: 0px!important;	
 }
 
 .list-group-item:last-child {
 	margin-bottom: 0;
 	border-bottom-right-radius: 0px!important;
 	border-bottom-left-radius: 0px!important;
+}
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+	z-index: 2;
+	color: #fff;
+	background-color: #7ca4e6;
+	border-color: #7ca4e6;
 }
 
 
@@ -231,7 +240,7 @@ html, body, .container-fluid, #map {
 	left: 0px;
 	top: 0px;
 	margin-left: 16px;
-	margin-top: 68px;
+	margin-top: 24px;
 	background-color: white;
 	-moz-border-radius: 2px;
 	border-radius: 2px;
@@ -279,17 +288,17 @@ html, body, .container-fluid, #map {
 
 
 #box_busqueda{
-	width: 280px; 
+	width: 250px; 
 	height: auto; 
 	position: absolute;
-	margin-left: 25%; 
+	/*margin-left: 25%; */
 	margin-top: 20px;
 	z-index: 1;
 }
 
 
 #busqueda{
-	width:280px; 
+	width:250px; 
 	border-top-left-radius: 5px !important;
 	border-top-right-radius: 5px!important;
 	border-bottom-left-radius: 5px!important;
@@ -305,7 +314,8 @@ html, body, .container-fluid, #map {
 	overflow:scroll; 
 	overflow-x:hidden; 
 	display:none;
-	width: 278px;
+	width: inherit;
+	padding-top: 5px;
 	margin-left: -14px;
 }
 
@@ -314,7 +324,8 @@ html, body, .container-fluid, #map {
 }
 
 h4{
-	font-size:17px;
+	font-size:22px;
+	font-family: 'Yanone Kaffeesatz', sans-serif;
 }
 
 /* Generadas con codigo javascript */
@@ -368,9 +379,9 @@ h4{
 
 .img_derecha:hover{
 	position:relative;
-	height:27px;
-	width:47px;
-	background-color: #f07612;
+	height:29px;
+	width:49px;
+	/*background-color: #b78c33;*/
  
 }
 
@@ -380,12 +391,11 @@ h4{
 
 
 .padding_row{
-	padding-left:15px;
+	padding-left:20px;
+	padding-right:20px;
 }
 
 .justify_text{
-	widht: 490px!important; 
-	max-width:490px; 
 	overflow-wrap: break-word;
 	word-wrap: break-word; 
 	word-break: break-all; 
@@ -405,28 +415,70 @@ h4{
 }
 
 .parrafo_result:hover{
-	background-color:#b78c33;
+	background-color:#db4437/*#b78c33*/;
 	color: white;
 }
+
+/*estilos infowindow */
+#iw-container  .iw-title {
+	font-family: 'Open Sans Condensed', sans-serif;
+	font-size: 22px;
+	font-weight: 400;
+	padding: 15px;
+	background-color: #48b5e9;
+	color: white;
+	margin: 0px;
+	border-radius: 2px 2px 0 0;
+}
+
+.iw-subTitle {
+	font-size: 16px;
+	font-weight: 700;
+	padding: 5px 0;
+	padding-left: 10px;
+}
+
+.iw-content input {
+	float: right;
+	margin: 0 5px 5px 10px;
+}
+
+.iw-content p {
+	padding-left: 10px;
+}
+
+/*fin estilos infowindow*/
+
+
+
+h3{
+	font-family: 'Patrick Hand', cursive;
+}
+
+h5{
+	font-size: 20px;
+	font-family: 'Patrick Hand', cursive;
+}
+
+
+
+
+
+
 
 
 
 
 
 /* FOOTER */
-#footer {
-	height:20px;
-}
-
-
 footer.nb-footer {
 	background: #222;
-	border-top: 4px solid #b78c33; 
+	/*border-top: 4px solid #b78c33; */
 }
 
 footer.nb-footer .about {
 	margin: 0 auto;
-	margin-top: 40px;
+	margin-top: -18px;
 	max-width: 1170px;
 	text-align: center; 
 }
@@ -439,7 +491,7 @@ footer.nb-footer .about p {
 
 
 footer.nb-footer .about .social-media {
-	margin-top: 15px; 
+	margin-top: 10px; 
 }
 
 
@@ -450,49 +502,25 @@ footer.nb-footer .about .social-media ul li a {
 	line-height: 45px;
 	border-radius: 50%;
 	font-size: 16px;
-	color: #b78c33;
+	color: #fff/*#db4437/*#b78c33*/;
 	border: 1px solid rgba(255, 255, 255, 0.3); 
 }
 
 
 footer.nb-footer .about .social-media ul li a:hover {
-	background: #b78c33;
-	color: #fff;
-	border-color: #b78c33; 
+	background: #fff/*#b78c33*/;
+	color: black;
+	border-color: #fff/*#b78c33*/; 
 }
 
 
-footer.nb-footer .footer-info-single {
-	margin-top: 30px; 
-}
 
 
-footer.nb-footer .footer-info-single .title {
-	color: #aaa;
-	text-transform: uppercase;
-	font-size: 16px;
-	border-left: 4px solid #b78c33;
-	padding-left: 5px; 
-}
 
-footer.nb-footer .footer-info-single ul li a {
-	display: block;
-	color: #aaa;
-	padding: 2px 0; 
-}
 
-footer.nb-footer .footer-info-single ul li a:hover {
-	color: #b78c33; 
-}
-
-footer.nb-footer .footer-info-single p {
-	font-size: 13px;
-	line-height: 20px;
-	color: #aaa; 
-}
 
 footer.nb-footer .copyright {
-	margin-top: 15px;
+	margin-top: 1px;
 	background: #111;
 	padding: 7px 0;
 	color: #999; 
@@ -505,9 +533,12 @@ footer.nb-footer .copyright p {
 
 
 
-
-
-
+@media screen and (max-width: 767px) { /*de 767 para abajo*/
+	#box_busqueda{
+		margin-left: 0px !important; 
+		margin-top: 670px;
+	}	
+}
 
 
 

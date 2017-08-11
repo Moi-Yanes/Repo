@@ -20,14 +20,14 @@
 		<link type="text/css" rel="stylesheet" href='//netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css'>
 	</head>
 	<body>
-		<div class="container-fluid">
+		<div id="content_all" class="container-fluid">
 
 	
-			<div id ="menu" class="row">
+			<!--<div id ="menu" class="row">
 				<div class="col-xs-12">
 					hola header
 				</div>
-			</div>
+			</div>-->
 
 			<!-- div de busqueda -->
 			<div id="box_busqueda" class="container-fluid">
@@ -40,8 +40,8 @@
 
 			<!-- CONTENIDO DE LA PAGINA -->
 			<div class="row fill-height">
-				<div id="mycontainer" class="mycontainer col-xs-3">
-					<div class="column-left row">
+				<div id="mycontainer" class="mycontainer col-xs-12 col-sm-6 col-lg-4"><!--col-xs-12 col-sm-6 col-lg-4-->
+					<div id="column-left" class="column-left row">
 						<div id="div_box" class="box">
 							<div id="d1b" class="container-fluid">
 								<div class="row vertical_center">
@@ -111,7 +111,7 @@
 				</div>
 
 
-				<div id="map" class="col-xs-9"></div>
+				<div id="map" class="col-xs-12 col-sm-6 col-lg-8"></div><!--col-xs-12 col-sm-6 col-lg-8 -->
 			</div>
 			
 
@@ -120,7 +120,7 @@
 				<footer class="nb-footer">
 					<div class="container">
 						<div class="row">
-							<div class="col-sm-12">
+							<div class="col-xs-12">
 								<div class="about">
 									<img src="images/logo.png" class="img-responsive center-block" alt="">
 									<p>
@@ -131,10 +131,10 @@
 
 									<div class="social-media">
 										<ul class="list-inline">
-											<li><a href="#" title=""><i class="fa fa-facebook"></i></a></li>
-											<li><a href="#" title=""><i class="fa fa-github"></i></a></li>
-											<li><a href="#" title=""><i class="fa fa-google-plus"></i></a></li>
-											<li><a href="#" title=""><i class="fa fa-linkedin"></i></a></li>
+											<li><a id="logo-facebook" href="#" title=""><i class="fa fa-facebook"></i></a></li>
+											<li><a id="logo-github" href="#" title=""><i class="fa fa-github"></i></a></li>
+											<li><a id="logo-google-plus" href="#" title=""><i class="fa fa-google-plus"></i></a></li>
+											<li><a id="logo-linkedin" href="#" title=""><i class="fa fa-linkedin"></i></a></li>
 										</ul>
 									</div>
 								</div>
@@ -144,10 +144,10 @@
 					<section class="copyright">
 						<div class="container">
 							<div class="row">
-								<div class="col-sm-6">
+								<div class="col-xs-12">
 									<p>Copyright © 2017. Design by Moisés Yanes</p>
 								</div>
-								<div class="col-sm-6"></div>
+								<!--<div class="col-xs-6"></div>-->
 							</div>
 						</div>
 					</section>

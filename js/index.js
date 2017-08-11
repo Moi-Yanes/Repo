@@ -12,7 +12,40 @@ function initMap() {
 	});
 
 
-	 infoWin = new google.maps.InfoWindow();
+	infoWin = new google.maps.InfoWindow();
+	google.maps.event.addListener(infoWin, 'domready', function() {
+
+		// Referência ao DIV que recebe o conteúdo da infowindow recorrendo ao jQuery
+		var iwOuter = $('.gm-style-iw');
+		iwOuter.css({
+			'top': '13px',
+			'left': '27px'
+		});
+
+		var iwCloseBtn = iwOuter.next();
+
+		// Efectos para botton cerrar del infowindow
+		iwCloseBtn.css({
+			width: '27px',
+			height: '27px',
+			overflow: 'hidden',
+			position: 'absolute',
+			opacity: '1',
+			'z-index': '10000',
+			cursor: 'pointer',
+			right: '-15px', top: '-15px', 		
+			border: '7px solid #48b5e9', 		
+			'border-radius': '13px', 		
+			'box-shadow': '0 0 5px #3990B9' 	
+		});
+
+
+		iwCloseBtn.mouseout(function(){
+			$(this).css({opacity: '1'});
+		});
+
+	});
+
 
 	 //Obtenemos json con noticias agrupadas por ubicacion. Tenemos un array de arrays de tal forma que:
 	 /*
@@ -26,14 +59,21 @@ function initMap() {
 		//Obtener ubicaciones de cada agrupacion de noticias para posteriormente agruparlas por cercania 
 		for (var i = 0; i < json.length; i++) { 					
 			var data   = json[i];
-			var contentString = '<div id="content">'+
-						'<div id="siteNotice"></div>'+
-						'<h1 id="firstHeading" class="firstHeading">'+data[0].UBICACION+'</h1>'+
+			var contentString ='<div id="iw-container">'+
+						'<div class="iw-title">'+data[0].UBICACION+'</div>'+
+						'<div class="iw-content">'+
+							'<div class="iw-subTitle">'+data[0].UBICACION+'</div>'+
+							'<input id="btnver" type="button" value="Ver" onclick="show_noticias('+i+')">'+
+							'<p>Haciendo click en el boton siguiente podras acceder a todas las noticias de este sitio </p>'+
+						'</div>'+
+					   '</div>';
+			/*var contentString = '<div id="contentInfoWindow" class="container-fluid">'+
+						'<h2 id="firstHeading" class="firstHeading">'+data[0].UBICACION+'</h2>'+
 						'<div id="bodyContent">'+
 							'<p><b>'+data[0].UBICACION+'</b>, haciendo click en el boton siguiente podras acceder a todas las noticias de este sitio: </p><br>'+
 							'<input id="btnver" type="button" value="Ver" onclick="show_noticias('+i+')">'+
 						'</div>'+
-					    '</div>';
+					      '</div>';*/
 
 			locations.push({'lat' : parseFloat(data[0].LATITUD), 'lng': parseFloat(data[0].LONGITUD), 'info':  contentString, 'ubicacion':  data[0].UBICACION});
 			globaljson = json;
@@ -117,10 +157,11 @@ function show_noticias(index){
 		else{		
 			div_news += '<div class="row padding_row">';
 		}
-		div_news += '<div class="col-md-12 horizontal_center calc_tam">'+
+		div_news += '<div class="col-xs-12 horizontal_center calc_tam">'+
 				'<div class="div_img_izq"><img class="img_izquierda" src="http://localhost/TFG/images/marker_transparent.png"/></div>'+
-				'<div class="div_parrafo"><p class="parrafo">'+reducirTitulo(data[j].TITULO)+'</p></div>'+
+				'<div id="div_parrafo" class="div_parrafo"><p class="parrafo">'+reducirTitulo(data[j].TITULO)+'</p></div>'+
 				'<div title="Consultar noticia" class="div_img_de">'+
+					//'<p><span style="color:#db4437; font-size: 20px;" class="glyphicon glyphicon-eye-open "></span></p>'+
 					'<img alt="Consultar noticia" onclick="goRight('+index+','+j+');" class="img_derecha" src="http://localhost/TFG/images/view_transparent.png"/>'+
 				'</div>'+
 			     '</div>'+
@@ -143,14 +184,14 @@ function goRight(index, i){
 
 	/* Añadir los datos de una noticia en concreto al box2 */
 	var div_info_new = '';
-	div_info_new += '<div class="row padding_row">'+
+	div_info_new += '<div style="margin-top:15px;" class="row padding_row">'+
 		    		'<div class="col-xs-12">'+
-					'<h5>'+data.UBICACION+' > '+data.RSS+'</h5>'+
+					'<h5>'+data.UBICACION+'</h5>'+
 				'</div>'+
 		    	'</div>'+
 			'<div class="row padding_row">'+
-				'<div class="col-xs-12">'+
-					'<h5>'+data.FECHA+'</h5>'+
+				'<div style="margin-top:-10px!important;" class="col-xs-12">'+
+					'<h5>'+data.RSS+': '+data.FECHA+'</h5>'+
 				'</div>'+
 		    	'</div>'+
 			'<div class="row padding_row">'+
@@ -206,7 +247,8 @@ function goRight(index, i){
 	var initalLeftMargin = $( ".column-left" ).css('margin-left').replace("px", "")*1;
 	var widthDiv = document.getElementById('div_box').offsetWidth;
 
-	var newLeftMargin = (initalLeftMargin - widthDiv); 
+
+	var newLeftMargin = (initalLeftMargin - widthDiv ); 
 	$( ".column-left" ).animate({marginLeft: newLeftMargin}, 500);
 }
 
@@ -219,7 +261,8 @@ function goLeft(index){
 	var initalLeftMargin = $( ".column-left" ).css('margin-left').replace("px", "")*1;
 	var widthDiv2 = document.getElementById('div_box2').offsetWidth;
 
-	var newLeftMargin = (initalLeftMargin + widthDiv2); 
+
+	var newLeftMargin = (initalLeftMargin + widthDiv2 );
 	$( ".column-left" ).animate({marginLeft: newLeftMargin}, 500);
 }
 
@@ -230,7 +273,7 @@ var openDiv;
 function toggleDiv(divID) {
 
 	var mycontainerWidth = document.getElementById('mycontainer').offsetWidth;
-	document.getElementById('option_box_div').style.marginLeft = (mycontainerWidth-62)+'px';
+	document.getElementById('option_box_div').style.marginLeft = (mycontainerWidth-70)+'px';
 
 	//fade div
 	$("#" + divID).fadeToggle(400, function() {
@@ -246,7 +289,7 @@ function pad(input, length, padding) {
 
 
 //FUNCION PARA ACORTAR LA LONGITUD DE UNA CADENA
-function reducirTitulo(str){
+function reducirTitulo(str, leng=null){
 	var leng = 37;
 	var strnew;
 	str = str.trim();
@@ -279,10 +322,10 @@ function boxVisible(id) {
 	var mapLeft = map.offset().left;
 	var mapRight = ($(window).width() - (mapLeft + map.outerWidth())); //calcular margin-right
 
-	var boxLeft = box.offset().left;
+	var boxLeft = box.offset().left +10;
 	var boxRight = ($(window).width() - (boxLeft + box.outerWidth())); //calcular margin-right
 	
-	
+
 	if (boxLeft >= mapLeft || boxRight <= mapRight) {		   //Si el box esta "dentro/detras" del map
 		visible = false;
 	}
@@ -303,7 +346,7 @@ function cerrarLeyenda(){
 
 	//Mover busqueda box
 	document.getElementById('box_busqueda').style.marginLeft = '180px';
-	document.getElementById('box_busqueda').style.marginTop = '25px';
+	document.getElementById('box_busqueda').style.marginTop = '30px';
 
 	//Ocultar container de boxs y mostrar divleyenda
 	$("#leyenda_div").show();
@@ -458,6 +501,8 @@ function buscarUbicacion(){
 	//hacemos focus al campo de búsqueda
 	$('#busqueda').click( function (){
 		$("#busqueda").focus();
+		$("#busqueda").animate({width:"360px"},500);
+		$("#busqueda_result").animate({width:"360px"},500);
 	});	
 
                                                                                                     
@@ -509,40 +554,127 @@ $(document).click(function(e) {
 		toggleDiv(openDiv);
 	}
 
-	//si el div de resultados de busqueda esta abierto, cerrarlo
-	if(!$(e.target).closest('#busqueda_result').length){
+	//si se clica en el body y el box de busqueda esta expandido entonces ocultamos resultados y reducimos largo del div
+	if(!$(e.target).closest('#box_busqueda').length){	
 		$('#busqueda_result').hide('slow');
+		$("#busqueda").animate({width:"250px"},500);
+		$("#busqueda_result").animate({width:"250px"},500);
 		document.getElementById('busqueda').value = "";
 	}
+
 });
+
+
+
+
+//variables globales para usarlas mas abajo
+var ventana_alto;
+var ventana_ancho;
+var ventana_pequena = false;
+$(document).ready(function(){
+        buscarUbicacion(); 
+
+	//calcular donde colocar el div de opciones
+	var mycontainerWidth = document.getElementById('mycontainer').offsetWidth;	
+	document.getElementById('box_busqueda').style.marginLeft = (mycontainerWidth)+'px';
+
+	//activar el scroll y en mycontainer
+	if(ventana_alto < 780 ){
+		document.getElementById('mycontainer').style.overflowY = 'visible';
+		ventana_pequena = true;
+	}  
+
+
+	ventana_ancho = $(window).width();
+	ventana_alto  = $(window).height(); 
+	
+	$(window).on('resize', function(){
+
+		//redimension de alto
+		if($(this).height() != ventana_alto){
+			
+			//Controlar redimension con el overflow del mycontainer
+			if ( ventana_pequena == false){
+				var nuevo_alto = $(window).height(); 
+				if( nuevo_alto < ventana_alto){
+					if (boxVisible("div_box2") == true){
+						if( document.getElementById('mycontainer').style.overflowY != 'visible'){
+							document.getElementById('mycontainer').style.overflowY = 'visible';
+					
+							var margin = $('#column-left').css("marginLeft").replace('px', '');
+							console.log(margin);
+							var new_margin = parseInt(margin) + 10;
+							console.log(new_margin);
+							document.getElementById('column-left').style.marginLeft = new_margin + 'px';
+						}
+					}
+					else if (boxVisible("div_box") == true){
+						document.getElementById('mycontainer').style.overflowY = 'visible';
+						document.getElementById('column-left').style.marginLeft = '-15px';
+					}
+				}   
+				else if( nuevo_alto >= ventana_alto){
+					if (boxVisible("div_box2") == true){
+						if( document.getElementById('mycontainer').style.overflowY != 'hidden'){
+							document.getElementById('mycontainer').style.overflowY = 'hidden';
+
+							var margin = $('#column-left').css("marginLeft").replace('px', '');
+							var new_margin = parseInt(margin) - 10;
+							document.getElementById('column-left').style.marginLeft = new_margin + 'px';
+						}else{				
+							var margin = $('#column-left').css("marginLeft").replace('px', '');
+							var new_margin = margin;
+							document.getElementById('column-left').style.marginLeft = new_margin + 'px';
+						}
+					}
+					else if (boxVisible("div_box") == true){
+						document.getElementById('mycontainer').style.overflowY = 'hidden';
+						document.getElementById('column-left').style.marginLeft = '-15px';
+					}
+				}
+			}
+		}
+
+
+		//redimension de ancho
+		if($(this).width() != ventana_ancho){
+			var nuevo_ancho = $(window).width();
+			
+			if (boxVisible("div_box2") == true){
+			
+				var margin = $('#mycontainer').css("marginLeft").replace('px', '');
+				var width_column = document.getElementById('column-left').offsetWidth;
+				var margin_new = parseInt(margin) - width_column - 15;
+				//var new_margin = parseInt(margin) + 10;
+				document.getElementById('column-left').style.marginLeft = margin_new + 'px';
+				
+			}
+		}
+	}); 
+}); 
 
 
 
 
 $(window).resize(function(){
 
+
 	//Recalcular margen en option box div cada vez que se redimencione la pantalla
    	var mycontainerWidth = document.getElementById('mycontainer').offsetWidth;
-	document.getElementById('option_box_div').style.marginLeft = (mycontainerWidth-62)+'px';
+	document.getElementById('option_box_div').style.marginLeft = (mycontainerWidth-70)+'px';
+	
 
+	//recolocar busqueda box
+	ventana_ancho_new = $(window).width();
+	if(ventana_ancho_new >= 768)
+		document.getElementById('box_busqueda').style.marginLeft = (mycontainerWidth)+'px';
+		
 
 	//centrar map
 	//var center = map.getCenter();
 	google.maps.event.trigger(map, "resize");
 	map.setCenter({lat: 28.48, lng: -16.32});
 })
-
-
-
-
-
-$(document).ready(function(){
-        buscarUbicacion();                        
-}); 
-
-
-
-
 
 
 
