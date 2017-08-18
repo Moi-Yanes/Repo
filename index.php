@@ -191,7 +191,8 @@
 
 		<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBK16iT0lz1tODBvJqToq_ret28wpSPTk&callback=initMap" async defer></script>
-
+		<!--<script src="<?php echo SERVER_PATH; ?>js/maplabel-compiled.js"></script>-->
+		
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 		<script src="<?php echo SERVER_PATH; ?>js/index.js"></script>

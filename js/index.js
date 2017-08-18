@@ -1,15 +1,58 @@
 /*variables globales*/
 var globaljson; var map; var allMarkers = []; var infoWin;
-var ubicacion_actual;
+var ubicacion_actual; var geojson=false;
+
+
+//Añadir un boton para delimitar distritos de santa cruz de tenerife
+function CustomControl(controlDiv, map) {
+
+    	// Set CSS for the control border
+	var controlUIr = '<button type="button" class="btn btn-default">Delimitar distritos</button>';
+	var controlUI = document.createElement('div');
+	    controlUI.innerHTML = controlUIr;
+	    controlUI.style.height = '23px';
+	    controlUI.style.marginTop = '20px';
+	    controlUI.style.marginRight = '10px';
+	    controlUI.style.paddingTop = '1px';
+	    controlUI.style.textAlign = 'center';
+
+	controlDiv.appendChild(controlUI);
+
+	// Setup the click event listeners
+	var GeoJson;
+	google.maps.event.addDomListener(controlUI, 'click', function () {
+		if(geojson == false){
+			geojson = true;
+			GeoJson = map.data.loadGeoJson('http://localhost/TFG/dump/distritos.geojson.json');
+		}
+		else{
+			geojson = false;
+			map.data.forEach(function (feature) {
+			    map.data.remove(feature);
+			});
+		}
+	});
+}
+
 
 //INICIALIZAR MAPA CREANDO EL ARRAY DE LOCALIZACIONES
 function initMap() {
 
 	map = new google.maps.Map(document.getElementById('map'), {
-	  center: {lat: 28.48, lng: -16.32}, //(Y,X)la laguna
-	  zoom: 11,
-	  mapTypeControl: false
+		center: {lat: 28.48, lng: -16.32}, //(Y,X)la laguna
+		zoom: 11,
+		mapTypeControl: false,
+		fullscreenControl: false
 	});
+
+
+	// Create the DIV to hold the control and call the CustomControl() constructor passing in this DIV.
+	var customControlDiv = document.createElement('div');
+	var customControl = new CustomControl(customControlDiv, map);
+
+	customControlDiv.index = 1;
+	map.controls[google.maps.ControlPosition.RIGHT_TOP].push(customControlDiv);
+
 
 
 	infoWin = new google.maps.InfoWindow();
