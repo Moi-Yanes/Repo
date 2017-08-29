@@ -526,7 +526,7 @@ function descargarNewsPdf(){
 			method  : 'post',
 			data	: {pdf : ubicacion_actual},		//pasar el array de objetos de las noticias a php y que este rellene el fichero txt
 			success:function(data, textStatus, jqXHR){
-				console.log('AJAX SUCCESS');
+				console.log('AJAX SUCCESS'+ data);
 				window.open('http://'+path+'/dump/downloadfile.pdf',"_blank");
 			}, 
 			complete : function(data, textStatus, jqXHR){

@@ -46,7 +46,7 @@ class PDF extends FPDF
 
 if( isset($_POST['pdf']) ){
 	
-	$nombre_archivo = '/var/www/html/TFG/dump/downloadfile.pdf'; 
+	$nombre_archivo = '/home/usuario/TFG/dump/downloadfile.pdf'; 
 	$json = $_POST['pdf'];
 
 	/*if(!file_exists($nombre_archivo)){	
@@ -59,9 +59,11 @@ if( isset($_POST['pdf']) ){
 	$pdf 	= new PDF();
 	$ubi 	= $json[0]['UBICACION'];
 	$fecha 	= $json[0]['FECHA'];
-	
+
+
+	$i=1; echo count($json);
 	foreach($json as $r){
-		if($r['TITULO'] != null ){
+		if( $i < count($json) ){
 			$pdf->AddPage();
 			$pdf->SetFont('Helvetica','B',14);
 			$col1="PERIODICO";
@@ -101,12 +103,13 @@ if( isset($_POST['pdf']) ){
 			$col6=$r['LINK'];
 			$pdf->MultiCell(190, 7, $col6, 0);
 		}
+		$i = $i+1;
 	}	
 
 	header("Content-type:application/pdf");
 	header('Content-type: application/force-download');
 	header('Content-Disposition: attachment; filename="downloadfile.pdf"');
-	header('Content-Length: '.filesize('/var/www/html/TFG/dump/downloadfile.pdf'));
+	header('Content-Length: '.filesize($nombre_archivo));
 
 	$pdf->Output($nombre_archivo, 'F'); // Save file locally
 
