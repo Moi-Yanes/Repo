@@ -1,4 +1,5 @@
 /*variables globales*/
+var path = '10.6.129.75';
 var globaljson; var map; var allMarkers = []; var infoWin;
 var ubicacion_actual; var geojson=false;
 
@@ -23,7 +24,7 @@ function CustomControl(controlDiv, map) {
 	google.maps.event.addDomListener(controlUI, 'click', function () {
 		if(geojson == false){
 			geojson = true;
-			GeoJson = map.data.loadGeoJson('http://10.6.129.75/dump/distritos.geojson.json');
+			GeoJson = map.data.loadGeoJson('http://'+path+'/dump/distritos.geojson.json');
 		}
 		else{
 			geojson = false;
@@ -96,7 +97,7 @@ function initMap() {
 		En la posicion 1 tenemos todas las noticias(cada una en un array) referentes a la ubicacion Y
 		...
 	 */
-	 $.getJSON("http://10.6.129.75/dump/coordenadas.json", function(json) {
+	 $.getJSON('http://'+path+'/dump/coordenadas.json', function(json) {
 		var locations= [];
 		
 		//Obtener ubicaciones de cada agrupacion de noticias para posteriormente agruparlas por cercania 
@@ -200,11 +201,11 @@ function show_noticias(index){
 			div_news += '<div class="row padding_row">';
 		}
 		div_news += '<div class="col-xs-12 horizontal_center calc_tam">'+
-				'<div class="div_img_izq"><img class="img_izquierda" src="http://10.6.129.75/images/marker_transparent.png"/></div>'+
+				'<div class="div_img_izq"><img class="img_izquierda" src="http://'+path+'/images/marker_transparent.png"/></div>'+
 				'<div id="div_parrafo" class="div_parrafo"><p class="parrafo">'+reducirTitulo(data[j].TITULO)+'</p></div>'+
 				'<div title="Consultar noticia" class="div_img_de">'+
 					//'<p><span style="color:#db4437; font-size: 20px;" class="glyphicon glyphicon-eye-open "></span></p>'+
-					'<img alt="Consultar noticia" onclick="goRight('+index+','+j+');" class="img_derecha" src="http://10.6.129.75/images/view_transparent.png"/>'+
+					'<img alt="Consultar noticia" onclick="goRight('+index+','+j+');" class="img_derecha" src="http://'+path+'/images/view_transparent.png"/>'+
 				'</div>'+
 			     '</div>'+
 		    	'</div>';//cierre div row
@@ -278,7 +279,7 @@ function goRight(index, i){
 		    	'</div>'+	
 			'<div style="margin-top:50px; margin-bottom:50px;" class="row padding_row horizontal_center">'+
 		    		'<div class="col-xs-12">'+
-					'<img onclick="show_noticias('+index+');" class="img_derecha" src="http://10.6.129.75/images/flecha.png"/>'+
+					'<img onclick="show_noticias('+index+');" class="img_derecha" src="http://'+path+'/images/flecha.png"/>'+
 				'</div>'+
 		    	'</div>';
 			
@@ -469,12 +470,12 @@ function descargarNews(){
 	}
 	else{
 		$.ajax({
-			url     : 'http://10.6.129.75/php/downloadfile.php?file=downloadfile.json&opcion=1',
+			url     : 'http://'+path+'/php/downloadfile.php?file=downloadfile.json&opcion=1',
 			method  : 'post',
 			data	: {json : JSON.stringify(ubicacion_actual)},			   //pasar el array de objetos de las noticias a php y que este rellene el fichero json
 			success:function(data, textStatus, jqXHR){
 				console.log('AJAX SUCCESS');
-				window.location.href = "http://10.6.129.75/php/downloadfile.php?file=downloadfile.json&opcion=1";//para que se lleve a cabo la descarga
+				window.location.href = 'http://'+path+'/php/downloadfile.php?file=downloadfile.json&opcion=1';//para que se lleve a cabo la descarga
 			}, 
 			complete : function(data, textStatus, jqXHR){
 				console.log('AJAX COMPLETE');
@@ -494,12 +495,12 @@ function descargarNewsTxt(){
 	}
 	else{
 		$.ajax({
-			url     : 'http://10.6.129.75/php/downloadfile.php?file=downloadfile.txt&opcion=2',
+			url     : 'http://'+path+'/php/downloadfile.php?file=downloadfile.txt&opcion=2',
 			method  : 'post',
 			data	: {txt : ubicacion_actual},		//pasar el array de objetos de las noticias a php y que este rellene el fichero txt
 			success:function(data, textStatus, jqXHR){
 				console.log('AJAX SUCCESS');
-				window.location.href = "http://10.6.129.75/php/downloadfile.php?file=downloadfile.txt&opcion=2";//para que se lleve a cabo la descarga
+				window.location.href = 'http://'+path+'/php/downloadfile.php?file=downloadfile.txt&opcion=2';//para que se lleve a cabo la descarga
 			}, 
 			complete : function(data, textStatus, jqXHR){
 				console.log('AJAX COMPLETE');
@@ -521,12 +522,12 @@ function descargarNewsPdf(){
 	}
 	else{
 		$.ajax({
-			url     : 'http://10.6.129.75/php/downloadfilepdf.php',
+			url     : 'http://'+path+'/php/downloadfilepdf.php',
 			method  : 'post',
 			data	: {pdf : ubicacion_actual},		//pasar el array de objetos de las noticias a php y que este rellene el fichero txt
 			success:function(data, textStatus, jqXHR){
 				console.log('AJAX SUCCESS');
-				window.open("http://10.6.129.75/dump/downloadfile.pdf","_blank");
+				window.open('http://'+path+'/dump/downloadfile.pdf',"_blank");
 			}, 
 			complete : function(data, textStatus, jqXHR){
 				console.log('AJAX COMPLETE');

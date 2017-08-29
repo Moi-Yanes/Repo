@@ -11,7 +11,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Map</title>
+		<title>Sistema de Ubicacion Geografica de RSS a traves de PLN</title>
 		<meta name="viewport" content="initial-scale=1.0">
 		<meta charset="utf-8">
 
@@ -53,7 +53,7 @@
 											<input onclick="toggleDiv('option_box_div');" 
 												class="open_option_div" 
 												type="image" 
-												src="<?php echo SERVER_PATH; ?>images/puntos.png" 
+												src="<?php echo SERVER_PATH_IAAS; ?>images/puntos.png" 
 											/>
 										</div>	
 									</div>
@@ -86,7 +86,7 @@
 											<input onclick="toggleDiv('option_box_div');" 
 												class="open_option_div" 
 												type="image" 
-												src="<?php echo SERVER_PATH; ?>images/puntos.png" 
+												src="<?php echo SERVER_PATH_IAAS; ?>images/puntos.png" 
 											/>
 										</div>
 									</div>
