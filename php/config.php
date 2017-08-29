@@ -8,6 +8,6 @@
 		const MONGODB			= "mongodb://localhost:27017";
 		
 		//PHP Variables
-		const PATH			= "/var/www/html/TFG";
+		const PATH			= "/home/usuario/TFG"; //iaas path
 	}
 ?>
