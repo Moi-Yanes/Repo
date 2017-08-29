@@ -411,6 +411,7 @@
 		} 
 	}
 
+	
 
 	//DIVIDIR ARRAY Y AGRUPAR NOTICIAS SEGUN SU UBICACION
 	function split_array($array){
@@ -459,6 +460,11 @@
 
 
 
+	function porcentaje($total, $parte, $redondear = 2) {
+    		return round($parte / $total * 100, $redondear);
+	}
+
+
 	//CREAR FICHERO JSON SI AUN NO HA SIDO CREADO CON LA UBICACION y COORDENADAS DE CADA NOTICIA
 	function create_json_marcadores(){
 		
@@ -467,12 +473,41 @@
 		
 		$rows = $mongo->executeQuery('NoticiasDB.noticia', $query); // $mongo contains the connection object to MongoDB
 		$fila = $rows->toArray();
-		
+	
+		$porcentajes = array();
 
 		//Leer filas resultantes de la consulta
 		if ( !empty($fila) ){
 			
 			$noticias_agrupadas = split_array($fila);//agrupar noticias por ubicacion
+			$index 		    = 0;
+			foreach($noticias_agrupadas as $r){
+				$p_sucesos = 0;
+				$p_sociedad = 0;
+				$total_noticias = count($r);
+
+				//calcular porcentajes
+				foreach($r as $n){
+					if($n['RSS'] == 'Sucesos'){
+						$p_sucesos++;  }
+
+					if($n['RSS'] == 'Sociedad'){
+						$p_sociedad++; }
+				}
+			
+				//introducir en array
+				$p_su  = porcentaje($total_noticias, $p_sucesos, $redondear = 2);
+				$p_so  = porcentaje($total_noticias, $p_sociedad, $redondear = 2);
+				
+				$porcentajes = array(
+					'P_SUCESOS'	=> $p_su,
+					'P_SOCIEDAD'	=> $p_so,
+				);
+				
+				array_push($noticias_agrupadas[$index],$porcentajes);
+				$index++;
+			}
+
 			
 			//Crear json con barrios y coordenadas
 			$nombre_archivo = Config::PATH.'/dump/coordenadas.json'; 

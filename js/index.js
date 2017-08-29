@@ -102,22 +102,20 @@ function initMap() {
 		//Obtener ubicaciones de cada agrupacion de noticias para posteriormente agruparlas por cercania 
 		for (var i = 0; i < json.length; i++) { 					
 			var data   = json[i];
+			var index  = data.length - 1;
 
 			var contentString ='<div id="iw-container">'+
 						'<div class="iw-title">'+data[0].UBICACION+'</div>'+
 						'<div class="iw-content">'+
-							'<div class="iw-subTitle">'+data[0].UBICACION+'</div>'+
+							'<div class="iw-subTitle">Estadisticas</div>'+
+							'<div class="iw-content-left">'+
+								'<p> Sucesos: '+data[index].P_SUCESOS+' % </p>'+
+								'<p> Sociedad: '+data[index].P_SOCIEDAD+' % </p>'+
+							'</div>'+
 							'<input id="btnver" type="button" value="Ver" onclick="show_noticias('+i+')">'+
-							'<p>Haciendo click en el boton siguiente podras acceder a todas las noticias de este sitio </p>'+
 						'</div>'+
 					   '</div>';
-					   /*var contentString = '<div id="contentInfoWindow" class="container-fluid">'+
-						'<h2 id="firstHeading" class="firstHeading">'+data[0].UBICACION+'</h2>'+
-						'<div id="bodyContent">'+
-							'<p><b>'+data[0].UBICACION+'</b>, haciendo click en el boton siguiente podras acceder a todas las noticias de este sitio: </p><br>'+
-							'<input id="btnver" type="button" value="Ver" onclick="show_noticias('+i+')">'+
-						'</div>'+
-					   '</div>';*/
+
 
 			locations.push({'lat' : parseFloat(data[0].LATITUD), 'lng': parseFloat(data[0].LONGITUD), 'info':  contentString, 'ubicacion':  data[0].UBICACION});
 			globaljson = json;
@@ -195,8 +193,8 @@ function show_noticias(index){
 
 	//Establecer noticias
 	var div_news = '';
-	for (var j = 0; j < data.length; j++) {	
-		if(j == data.length-1)
+	for (var j = 0; j < data.length-1; j++) {	
+		if(j == data.length-2)
 			div_news += '<div class="row row_final_news padding_row">';
 		else{		
 			div_news += '<div class="row padding_row">';

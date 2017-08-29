@@ -429,6 +429,7 @@ h4{
 	color: white;
 	margin: 0px;
 	border-radius: 2px 2px 0 0;
+	width: 350px;
 }
 
 .iw-subTitle {
@@ -438,13 +439,17 @@ h4{
 	padding-left: 10px;
 }
 
+.iw-content-left{
+	float:left;
+}
+
 .iw-content input {
-	float: right;
-	margin: 0 5px 5px 10px;
+
+	margin: 0px 5px 5px 150px;
 }
 
 .iw-content p {
-	padding-left: 10px;
+	padding-left: 20px;
 }
 
 /*fin estilos infowindow*/

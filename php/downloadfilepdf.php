@@ -61,44 +61,46 @@ if( isset($_POST['pdf']) ){
 	$fecha 	= $json[0]['FECHA'];
 	
 	foreach($json as $r){
-		$pdf->AddPage();
-		$pdf->SetFont('Helvetica','B',14);
-		$col1="PERIODICO";
-		$pdf->Cell(80, 10, $col1, 0);
-		$pdf->Ln(10);
-		$pdf->SetFont('Helvetica','',12);
-		$col2=$r['PERIODICO'];
-		$pdf->Cell(80, 10, $col2, 0);
+		if($r['TITULO'] != null ){
+			$pdf->AddPage();
+			$pdf->SetFont('Helvetica','B',14);
+			$col1="PERIODICO";
+			$pdf->Cell(80, 10, $col1, 0);
+			$pdf->Ln(10);
+			$pdf->SetFont('Helvetica','',12);
+			$col2=$r['PERIODICO'];
+			$pdf->Cell(80, 10, $col2, 0);
 
-		$pdf->Ln(20);//salto de 5 lineas
+			$pdf->Ln(20);//salto de 5 lineas
 
-		$pdf->SetFont('Helvetica','B',14);
-		$col3="TITULAR";
-		$pdf->Cell(80, 10, $col3, 0);
-		$pdf->Ln(10);
-		$pdf->SetFont('Helvetica','',12);
-		$col4=$r['TITULO'];
-		$pdf->MultiCell(190, 7, $col4, 0);
+			$pdf->SetFont('Helvetica','B',14);
+			$col3="TITULAR";
+			$pdf->Cell(80, 10, $col3, 0);
+			$pdf->Ln(10);
+			$pdf->SetFont('Helvetica','',12);
+			$col4=$r['TITULO'];
+			$pdf->MultiCell(190, 7, $col4, 0);
 
-		$pdf->Ln(20);//salto de 5 lineas
+			$pdf->Ln(20);//salto de 5 lineas
 
-		$pdf->SetFont('Helvetica','B',14);
-		$col5="DESCRIPCION";
-		$pdf->Cell(80, 10, $col5, 0);
-		$pdf->Ln(10);
-		$pdf->SetFont('Helvetica','',12);
-		$col6=preg_replace('/<[\/\!]*?[^<>]*?>/si', '', $r['DESCRIPCION']);
-		$pdf->MultiCell(190, 7, $col6, 0);
+			$pdf->SetFont('Helvetica','B',14);
+			$col5="DESCRIPCION";
+			$pdf->Cell(80, 10, $col5, 0);
+			$pdf->Ln(10);
+			$pdf->SetFont('Helvetica','',12);
+			$col6=preg_replace('/<[\/\!]*?[^<>]*?>/si', '', $r['DESCRIPCION']);
+			$pdf->MultiCell(190, 7, $col6, 0);
 
-		$pdf->Ln(20);//salto de 5 lineas
+			$pdf->Ln(20);//salto de 5 lineas
 
-		$pdf->SetFont('Helvetica','B',14);
-		$col5="LINK";
-		$pdf->Cell(80, 10, $col5, 0);
-		$pdf->Ln(10);
-		$pdf->SetFont('Helvetica','',12);
-		$col6=$r['LINK'];
-		$pdf->MultiCell(190, 7, $col6, 0);
+			$pdf->SetFont('Helvetica','B',14);
+			$col5="LINK";
+			$pdf->Cell(80, 10, $col5, 0);
+			$pdf->Ln(10);
+			$pdf->SetFont('Helvetica','',12);
+			$col6=$r['LINK'];
+			$pdf->MultiCell(190, 7, $col6, 0);
+		}
 	}	
 
 	header("Content-type:application/pdf");
