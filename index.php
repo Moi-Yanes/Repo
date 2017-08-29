@@ -16,7 +16,7 @@
 		<meta charset="utf-8">
 
 		<link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-		<link type="text/css" rel="stylesheet" href="<?php echo SERVER_PATH; ?>bootstrap-3.3.7-dist/css/style.css">
+		<link type="text/css" rel="stylesheet" href="<?php echo SERVER_PATH_IAAS; ?>bootstrap-3.3.7-dist/css/style.css">
 		<link type="text/css" rel="stylesheet" href='//netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css'>
 	</head>
 	<body>
@@ -184,17 +184,17 @@
 		
 		
 
-		<script src="<?php echo SERVER_PATH; ?>js/jquery_easing/jquery.js"></script>
-		<script src="<?php echo SERVER_PATH; ?>js/jquery_easing/easing.js"></script>
+		<script src="<?php echo SERVER_PATH_IAAS; ?>js/jquery_easing/jquery.js"></script>
+		<script src="<?php echo SERVER_PATH_IAAS; ?>js/jquery_easing/easing.js"></script>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 		<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBK16iT0lz1tODBvJqToq_ret28wpSPTk&callback=initMap" async defer></script>
-		<!--<script src="<?php echo SERVER_PATH; ?>js/maplabel-compiled.js"></script>-->
+		<!--<script src="<?php echo SERVER_PATH_IAAS; ?>js/maplabel-compiled.js"></script>-->
 		
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-		<script src="<?php echo SERVER_PATH; ?>js/index.js"></script>
+		<script src="<?php echo SERVER_PATH_IAAS; ?>js/index.js"></script>
 	</body>
 </html>
