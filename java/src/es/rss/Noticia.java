@@ -286,32 +286,31 @@ public class Noticia {
 	};
 	
 	Date extraerFecha (String in) throws ParseException {
-//		try {
-			String out;
-			int indiceFecha = in.indexOf(ANYO);
-			
-			if (indiceFecha == -1) {
-				Date fecha_Actual = new Date();
-				int anyo = 1900 + fecha_Actual.getYear();
-				String fechaFormat = "" + anyo + "-";
-				int mes = 1 + fecha_Actual.getMonth();
-				String aux = "" + mes;
-				if (aux.length() == 1)
-					fechaFormat += "0" + aux + "-";
-				else
-					fechaFormat += aux + "-";
-				aux = "" + fecha_Actual.getDate();
-				if (aux.length() == 1)
-					fechaFormat += "0" + aux;
-				else
-					fechaFormat += aux;
-				return new SimpleDateFormat("yyyy-MM-dd").parse(fechaFormat);
-			}
-			
-			out = in.substring(indiceFecha, indiceFecha+10);
-			out = out.replaceAll("/", "-");
-			
-			return new SimpleDateFormat("yyyy-MM-dd").parse(out);
+		String out;
+		int indiceFecha = in.indexOf(ANYO);
+		
+		if (indiceFecha == -1) {
+			Date fecha_Actual = new Date();
+			int anyo = 1900 + fecha_Actual.getYear();
+			String fechaFormat = "" + anyo + "-";
+			int mes = 1 + fecha_Actual.getMonth();
+			String aux = "" + mes;
+			if (aux.length() == 1)
+				fechaFormat += "0" + aux + "-";
+			else
+				fechaFormat += aux + "-";
+			aux = "" + fecha_Actual.getDate();
+			if (aux.length() == 1)
+				fechaFormat += "0" + aux;
+			else
+				fechaFormat += aux;
+			return new SimpleDateFormat("yyyy-MM-dd").parse(fechaFormat);
+		}
+		
+		out = in.substring(indiceFecha, indiceFecha+10);
+		out = out.replaceAll("/", "-");
+		
+		return new SimpleDateFormat("yyyy-MM-dd").parse(out);
 	}	
 
 	public Noticia (Rss rss, Element node) throws ParseException {

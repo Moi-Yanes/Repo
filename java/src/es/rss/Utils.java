@@ -18,25 +18,26 @@ public class Utils {
 	public static ByteArrayInputStream TransformFile(Rss rss, Charset charter) throws IOException, InterruptedException {
 		System.out.println("Url: " + rss.url);
 		URL url = new URL(rss.url);
-	    URLConnection conn = url.openConnection();
-	    InputStream io = conn.getInputStream();
-	    System.out.println("Inpute Stream: " + io + " : " + rss.url);
-	    BufferedReader br = new BufferedReader(new InputStreamReader(io, "Cp1252"));
-	    System.out.println("br: " + br);
+		URLConnection conn = url.openConnection();
+		InputStream io = conn.getInputStream();
+
+		System.out.println("Inpute Stream: " + io + " : " + rss.url);
+		BufferedReader br = new BufferedReader(new InputStreamReader(io, "Cp1252"));
+		System.out.println("br: " + br);
 		StringBuilder sb = new StringBuilder();
 
 		String line;
 		while ((line = br.readLine()) != null) {
 			sb.append(Utils.tratar(line));
 		}
-		System.out.println("sb: " + sb);
-//		File file = new File(rss.periodico + ".txt");
-//		FileOutputStream fop = new FileOutputStream(file, false);
-//		fop.write(sb.toString().getBytes());
-//		fop.flush();
-//		fop.close();
-		
-//		InputStreamReader targetStream = new InputStreamReader(new FileInputStream(file), "Cp1252");
+		//System.out.println("sb: " + sb);
+		//		File file = new File(rss.periodico + ".txt");
+		//		FileOutputStream fop = new FileOutputStream(file, false);
+		//		fop.write(sb.toString().getBytes());
+		//		fop.flush();
+		//		fop.close();
+
+		//		InputStreamReader targetStream = new InputStreamReader(new FileInputStream(file), "Cp1252");
 		return new ByteArrayInputStream(sb.toString().getBytes(charter));
 	}		
 

@@ -6,6 +6,8 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import java.util.logging.Logger;
+import org.bson.types.ObjectId;
 
 //import es.dbpedia.DBpedia;
 import es.rss.Noticia;
@@ -21,6 +23,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import java.util.logging.*;
+
+
 
 public class MongoClienteNoticia {
 	
@@ -35,163 +40,184 @@ public class MongoClienteNoticia {
 	public static int RSS = 4;
 	public static int FECHA = 5;
 	
-	public static String DATABASE_PUBLIC = "public";
+	public static String DATABASE_PUBLIC = "NoticiasDB";
 	public static String TABLE_NOTICIAS = "noticia";
 	
 	public static String ELEMS_TABLE_NOTICIAS[] = {"periodico", "titular", "descripcion", "link", "rss", "fecha"}; 
- 
-    /**
-     * Clase para crear una conexión a MongoDB.
-     * @return MongoClient conexión
-     */
-    public MongoClienteNoticia() {
-        this.mongo = new MongoClient("localhost", 27017);
-        db = mongo.getDB(DATABASE_PUBLIC);
-        table = db.getCollection(TABLE_NOTICIAS);
-    }
- 
-    /**
-     * Clase que imprime por pantalla todas las bases de datos MongoDB.
-     * @param mongo conexión a MongoDB
-     */
-    public void printDatabases() {
-        List dbs = this.mongo.getDatabaseNames();
-        for (Object database : dbs) {
-        	DB db = mongo.getDB((String) database);
-        	Set<String> collections = db.getCollectionNames();
 
-        	for (String collectionName : collections) {
-        		System.out.println("Base de datos: " + (String) database + " Tabla: " + collectionName);
-        	}
-        }
-    }
-    
-    public void mostrarTabla () {
-	int numero = 0;
-	System.out.println("Listar los registros de la tabla: " + TABLE_NOTICIAS + " de la BD: " + DATABASE_PUBLIC);
-	DBCursor cur = table.find();
-	while (cur.hasNext()) {
-	numero++;
-	System.out.println(cur.next());
+
+	/**
+	* Clase para crear una conexión a MongoDB.
+	* @return MongoClient conexión
+	*/
+	public MongoClienteNoticia() {
+		this.mongo = new MongoClient("localhost", 27017);
+		db = mongo.getDB(DATABASE_PUBLIC);
+		table = db.getCollection(TABLE_NOTICIAS);
+
+		Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+		mongoLogger.setLevel(Level.SEVERE); 
 	}
-	System.out.println("El listado de elementos es: " + numero);
-	System.out.println();
-    }
-    
-    public Collection<String> TablatoArray () {
-	Collection<String> tabla = new ArrayList<String>();
 
 
-	int numero = 0;
-	System.out.println("Listar los registros de la tabla: " + TABLE_NOTICIAS + " de la BD: " + DATABASE_PUBLIC);
-	DBCursor cur = table.find();
-	while (cur.hasNext()) {
 
-	DBObject noticia = cur.next();
-	Noticia n = new Noticia(
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[TITULAR]),
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[DESCRIPCION]),
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[LINK]),
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[RSS]),
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[PERIODICO]),
-	    		(Date) noticia.get(ELEMS_TABLE_NOTICIAS[FECHA]));     
+	/**
+	* Clase que imprime por pantalla todas las bases de datos MongoDB.
+	* @param mongo conexión a MongoDB
+	*/
+	public void printDatabases() {
+		List dbs = this.mongo.getDatabaseNames();
+		for (Object database : dbs) {
+			DB db = mongo.getDB((String) database);
+			Set<String> collections = db.getCollectionNames();
 
-	String contenido = n.titular + ". " + n.descripcion;
-	tabla.add(contenido);
-	// System.out.println(numero + " : " + contenido);
-	numero++;
+			for (String collectionName : collections) {
+				System.out.println("Base de datos: " + (String) database + " Tabla: " + collectionName);
+			}
+		}
 	}
-	System.out.println("El listado de elementos es: " + numero);
-	System.out.println();
-	return tabla;
-    }        
-    
-    public void mostrarTablaFichero (String nombreFichero) throws IOException {
-	String ruta = nombreFichero;
-        File archivo = new File(ruta);
-        BufferedWriter bw;
-        bw = new BufferedWriter(new FileWriter(archivo));
-        
 
-    	int numero = 0;
-	System.out.println("Listar los registros de la tabla: " + TABLE_NOTICIAS + " de la BD: " + DATABASE_PUBLIC);
-	DBCursor cur = table.find();
 
-	while (cur.hasNext()) {
-	numero++;
-	System.out.println(numero);
+	public void mostrarTabla () {
+		int numero = 0;
+		System.out.println("Listar los registros de la tabla: " + TABLE_NOTICIAS + " de la BD: " + DATABASE_PUBLIC);
+		DBCursor cur = table.find();
 
-	DBObject noticia = cur.next();
-	Noticia n = new Noticia(
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[PERIODICO]),
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[TITULAR]),
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[DESCRIPCION]),
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[LINK]),
-	    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[RSS]),
-	    		(Date) noticia.get(ELEMS_TABLE_NOTICIAS[FECHA]));    	
-	bw.write(n.toString("ç") + "\n");
+		while (cur.hasNext()) {
+			numero++;
+			System.out.println(cur.next());
+		}
+		System.out.println("El listado de elementos es: " + numero);
+		System.out.println();
 	}
-	System.out.println("El listado de elementos es: " + numero);
-	System.out.println();
-	bw.close();
-    }
+
+
+	public Collection<String> TablatoArray () {
+		Collection<String> tabla = new ArrayList<String>();
+
+
+		int numero = 0;
+		System.out.println("Listar los registros de la tabla: " + TABLE_NOTICIAS + " de la BD: " + DATABASE_PUBLIC);
+		DBCursor cur = table.find();
+		while (cur.hasNext()) {
+
+			DBObject noticia = cur.next();
+			Noticia n = new Noticia(
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[TITULAR]),
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[DESCRIPCION]),
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[LINK]),
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[RSS]),
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[PERIODICO]),
+			    		(Date) noticia.get(ELEMS_TABLE_NOTICIAS[FECHA]));     
+
+			String contenido = n.titular + ". " + n.descripcion;
+			tabla.add(contenido);
+			// System.out.println(numero + " : " + contenido);
+			numero++;
+		}
+		System.out.println("El listado de elementos es: " + numero);
+		System.out.println();
+		return tabla;
+	}        
+
+
+	public void mostrarTablaFichero (String nombreFichero) throws IOException {
+		String ruta = nombreFichero;
+		File archivo = new File(ruta);
+		BufferedWriter bw;
+		bw = new BufferedWriter(new FileWriter(archivo));
+
+
+		int numero = 0;
+		System.out.println("Listar los registros de la tabla: " + TABLE_NOTICIAS + " de la BD: " + DATABASE_PUBLIC);
+		DBCursor cur = table.find();
+
+		while (cur.hasNext()) {
+			numero++;
+			System.out.println(numero);
+
+			DBObject noticia = cur.next();
+			Noticia n = new Noticia(
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[PERIODICO]),
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[TITULAR]),
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[DESCRIPCION]),
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[LINK]),
+			    		(String) noticia.get(ELEMS_TABLE_NOTICIAS[RSS]),
+			    		(Date) noticia.get(ELEMS_TABLE_NOTICIAS[FECHA]));    	
+			bw.write(n.toString("ç") + "\n");
+		}
+		System.out.println("El listado de elementos es: " + numero);
+		System.out.println();
+		bw.close();
+	}
 	     
-    
-    public boolean find (String titular) {
-	BasicDBObject whereQuery = new BasicDBObject();
-	whereQuery.put(ELEMS_TABLE_NOTICIAS[TITULAR], titular);
-	DBCursor cursor = table.find(whereQuery);
-	return cursor.hasNext();
-    }
-    
-    public Noticia findObject (String titular) {
-	BasicDBObject whereQuery = new BasicDBObject();
-	whereQuery.put(ELEMS_TABLE_NOTICIAS[TITULAR], titular);
-	DBCursor cursor = table.find(whereQuery);
-	if (cursor.hasNext()) {
-	DBObject noticia = cursor.next();
-	Noticia n = new Noticia(
-		(String) noticia.get(ELEMS_TABLE_NOTICIAS[PERIODICO]),
-		(String) noticia.get(ELEMS_TABLE_NOTICIAS[TITULAR]),
-		(String) noticia.get(ELEMS_TABLE_NOTICIAS[DESCRIPCION]),
-		(String) noticia.get(ELEMS_TABLE_NOTICIAS[LINK]),
-		(String) noticia.get(ELEMS_TABLE_NOTICIAS[RSS]),
-		(Date) noticia.get(ELEMS_TABLE_NOTICIAS[FECHA]));
-	return n;
+
+	public boolean find (String titular) {
+		BasicDBObject whereQuery = new BasicDBObject();
+		whereQuery.put(ELEMS_TABLE_NOTICIAS[TITULAR], titular);
+		DBCursor cursor = table.find(whereQuery);
+
+		return cursor.hasNext();
 	}
-	return null;
-    }    
-    
-    public boolean insertNoticia(Noticia n) {
-	if (find(n.titular))
-		return false;
 
-	//Crea los objectos básicos
-	BasicDBObject document = new BasicDBObject();
-	document.put(ELEMS_TABLE_NOTICIAS[0], n.periodico);
-	document.put(ELEMS_TABLE_NOTICIAS[TITULAR], n.titular);
-	document.put(ELEMS_TABLE_NOTICIAS[2], n.descripcion);
-	document.put(ELEMS_TABLE_NOTICIAS[3], n.enlace);
-	document.put(ELEMS_TABLE_NOTICIAS[4], n.tipo_noticia);
-	document.put(ELEMS_TABLE_NOTICIAS[5], n.fecha);
 
-	//Insertar tablas
-	this.table.insert(document);
-	return true;
-    }
+	public Noticia findObject (String titular) {
+		BasicDBObject whereQuery = new BasicDBObject();
+		whereQuery.put(ELEMS_TABLE_NOTICIAS[TITULAR], titular);
+		DBCursor cursor = table.find(whereQuery);
+
+		if (cursor.hasNext()) {
+			DBObject noticia = cursor.next();
+			Noticia n = new Noticia(
+				(String) noticia.get(ELEMS_TABLE_NOTICIAS[PERIODICO]),
+				(String) noticia.get(ELEMS_TABLE_NOTICIAS[TITULAR]),
+				(String) noticia.get(ELEMS_TABLE_NOTICIAS[DESCRIPCION]),
+				(String) noticia.get(ELEMS_TABLE_NOTICIAS[LINK]),
+				(String) noticia.get(ELEMS_TABLE_NOTICIAS[RSS]),
+				(Date) noticia.get(ELEMS_TABLE_NOTICIAS[FECHA]));
+			return n;
+		}
+
+		return null;
+	}   
  
-    public  void borrarNoticia(String titular) {
-    	//Crea los objectos básicos
-        BasicDBObject document = new BasicDBObject();
-        document.remove(ELEMS_TABLE_NOTICIAS[TITULAR], titular);
-        
-        //Insertar tablas
-        this.table.remove(document);
-    }
-    
-    public  void borrarAll() {
-        //Insertar tablas
-        this.table.drop();
-    }        
-    
+
+	public boolean insertNoticia(Noticia n) {
+		if (find(n.titular))
+			return false;
+
+		//Crea los objectos básicos
+		BasicDBObject document = new BasicDBObject();
+		document.put("_id", new ObjectId());
+		document.put(ELEMS_TABLE_NOTICIAS[0], n.periodico);
+		document.put(ELEMS_TABLE_NOTICIAS[TITULAR], n.titular);
+		document.put(ELEMS_TABLE_NOTICIAS[2], n.descripcion);
+		document.put(ELEMS_TABLE_NOTICIAS[3], n.enlace);
+		document.put(ELEMS_TABLE_NOTICIAS[4], n.tipo_noticia);
+		document.put(ELEMS_TABLE_NOTICIAS[5], n.fecha);
+		document.put("ubicacion", "");
+		document.put("latitud", "");
+		document.put("longitud", "");
+
+		//Insertar tablas
+		this.table.insert(document);
+		return true;
+	}
+
+
+	public  void borrarNoticia(String titular) {
+		//Crea los objectos básicos
+		BasicDBObject document = new BasicDBObject();
+		document.remove(ELEMS_TABLE_NOTICIAS[TITULAR], titular);
+
+		//Insertar tablas
+		this.table.remove(document);
+	}
+
+
+	public  void borrarAll() {
+		//Insertar tablas
+		this.table.drop();
+	}        
+	    
 }

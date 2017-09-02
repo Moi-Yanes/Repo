@@ -49,12 +49,12 @@ public class Rss {
 	public static Rss[] vectorRss = { 
 		new Rss ("http://eldia.es/rss/santacruz.rss", "Santa Cruz de Tenerife", "El Día"), 
 		new Rss ("http://eldia.es/rss/sociedad.rss", "Sociedad", "El Día Sociedad"), 
-		new Rss ("http://eldia.es/rss/sucesos.rss", "Sucesos", "El Día Sucesos"),
-		new Rss ("http://eldia.es/rss/canarias.rss", "Canarias", "El Día Canarias"),
+//		new Rss ("http://eldia.es/rss/sucesos.rss", "Sucesos", "El Día Sucesos"),
+//		new Rss ("http://eldia.es/rss/canarias.rss", "Canarias", "El Día Canarias"),
 		new Rss ("http://eldia.es/rss/laguna.rss", "La Laguna", "El Día La Laguna"),
-		new Rss ("http://eldia.es/rss/economia.rss", "Economía", "El Día La Economía"),
-		new Rss ("http://eldia.es/rss/nacional.rss", "Nacional", "El Día Nacional"),
-//		new Rss ("http://www.laopinion.es/elementosInt/rss/2", "Tenerife", "La Opinión"),
+//		new Rss ("http://eldia.es/rss/economia.rss", "Economía", "El Día La Economía"),
+//		new Rss ("http://eldia.es/rss/nacional.rss", "Nacional", "El Día Nacional"),
+		new Rss ("http://www.laopinion.es/elementosInt/rss/2", "Tenerife", "La Opinión"),
 		new Rss ("http://www.laopinion.es/elementosInt/rss/91", "La Laguna", "La Opinión"),
 		new Rss ("http://www.laopinion.es/elementosInt/rss/98", "Santa Cruz de Tenerife", "La Opinión"),
 		new Rss ("http://www.laopinion.es/elementosInt/rss/42", "Cabildo de Tenerife", "La Opinión Cabildo de Tenerife")
