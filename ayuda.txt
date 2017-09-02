@@ -1,6 +1,6 @@
 Compilar java 
 	javac -d clases src/es/rss/Rss.java src/main.java
-
+	javac -classpath .:./lib/mongo-java-driver-3.5.0.jar:./lib/jdom-2.0.2.jar:./lib/junit-4.10.jar -d clases src/es/rss/*.java src/es/mongodb/MongoClienteNoticia.java src/main.java
 
 ejecutar java
 	cd clases/
