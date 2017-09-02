@@ -1,0 +1,7 @@
+Compilar java 
+	javac -d clases src/es/rss/Rss.java src/main.java
+
+
+ejecutar java
+	cd clases/
+	java Main
