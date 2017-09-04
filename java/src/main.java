@@ -27,6 +27,15 @@ class Main
 	}
 
 
+	public void testFecha()
+	{
+		MongoClienteNoticia cliente = new MongoClienteNoticia();
+		Noticia n = new Noticia("Probando insert noticia 2", "En Santa cruz", "http://jaja", "Rss El dia", "El dia", new Date());
+
+		System.out.println("Fecha: " + n.fecha);
+	}
+
+
 	public void testRss()
 	{
 		MongoClienteNoticia cliente = new MongoClienteNoticia();
@@ -47,9 +56,11 @@ class Main
 	{
 		Main main = new Main();
 
-		main.testCrearRSS();
+		//main.testCrearRSS();
 		//main.testInsertarNoticia();
 		main.testRss();
+
+		//main.testFecha();
 
 		
 	}

@@ -2,7 +2,7 @@
 	/* PHP ERRORS */
 	ini_set('display_errors','On');
 
-	/* PHP CONFIG */
+	/* PHP FILES */
 	require_once 'include.php';
 
 
@@ -104,13 +104,13 @@
 
 
 					//Si no se ha encontrado ninguna palabra clave en las comparaciones previas buscamos la palabra capital por si aparece
-					if($encontrado == false){	
+					/*if($encontrado == false){	
 						if(in_array("capital", $c_titulo) || in_array("capital", $c_descripcion)){
 							$ubicacion = "SANTA CRUZ DE TENERIFE";
 							$latlong = [28.463938,-16.262598];
 							$encontrado = true;
 						}	
-					}							
+					}*/							
 
 
 					//GUARDAR UBICACION EN LA BBDD CON SUS COORDENADAS	
@@ -132,41 +132,15 @@
 					}
 				}
 				$mongo->executeBulkWrite('NoticiasDB.noticia', $bulk); //Actualizar el campo ubicacion de la coleccion de noticias de la base de datos
+				echo "\nNoticias insertadas en la base de datos!";
 			}else{
-				echo "No hay noticias!";			
+				echo "\nNo hay noticias!";			
 			}
 		}
 		else{
-			echo "No hay lugares!".'<br>';
+			echo "\nNo hay lugares!";
 		}
 	}
-
-	//Ficheros csv a insertar
-	/*insert_coordenadas_bd("barrios.csv");
-	insert_coordenadas_bd("esculturas.csv");
-	insert_coordenadas_bd("farmacias.csv");
-	insert_coordenadas_bd("hoteles.csv");
-	insert_coordenadas_bd("instculturales.csv");
-	insert_coordenadas_bd("instdeportivas.csv");
-	insert_coordenadas_bd("instseguridad.csv");
-	insert_coordenadas_bd("miradores.csv");
-	insert_coordenadas_bd("parquesinfantiles.csv");
-	
-	insert_coordenadas_bd("administracionyserviciospublicos.csv");
-	insert_coordenadas_bd("agricultura.csv");
-	insert_coordenadas_bd("alimentacion.csv");
-	insert_coordenadas_bd("hosteleriayrestauracion.csv");
-	insert_coordenadas_bd("asociacionesciudadania.csv");
-	insert_coordenadas_bd("comercio.csv");
-	insert_coordenadas_bd("educacionycultura.csv");
-	insert_coordenadas_bd("medicinaysalud.csv");
-	insert_coordenadas_bd("carreteras.csv");
-	//insert_coordenadas_bd("general.csv");
-	insert_coordenadas_bd("distritos.csv");
-	insert_coordenadas_bd("lugares.csv");
-	*/
-	
-	//insert_ubicacion();
 
 
 
@@ -283,19 +257,20 @@
 			if(!file_exists($nombre_archivo)){	
 				$fp = fopen($nombre_archivo,"w+");
 				fwrite($fp, json_encode($noticias_agrupadas));
-				fclose($fp);	
+				fclose($fp);
+				echo "\nFichero de marcadores creado!";	
 			}else{
 				$fp = fopen($nombre_archivo,"a+");
 				fwrite($fp, json_encode($noticias_agrupadas));
 				fclose($fp);
+				echo "\nFichero de marcadores creado!";
 			}
 		}
 		else{
-			echo "No existen noticias";
+			echo "\nNo existen noticias";
 		}
 
 	}
-	//create_json_marcadores();
 
 
 
