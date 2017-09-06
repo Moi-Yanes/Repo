@@ -36,7 +36,7 @@ class Main
 	}
 
 
-	public void testRss()
+	public void InsertarRss()
 	{
 		MongoClienteNoticia cliente = new MongoClienteNoticia();
 		CapturarRSS captura = new CapturarRSS();
@@ -58,10 +58,8 @@ class Main
 
 		//main.testCrearRSS();
 		//main.testInsertarNoticia();
-		main.testRss();
-
 		//main.testFecha();
 
-		
+		main.InsertarRss();
 	}
 }

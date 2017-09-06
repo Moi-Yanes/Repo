@@ -26,7 +26,7 @@ public class Noticia {
 	final String SOCIEDAD = "Sociedad";
 
 	// Lugares
-	String[][] Lugares = {
+	/*String[][] Lugares = {
 			{"Acorán",                                          "Acorán"},
 			{"Anaga",                                           "Anaga"},
 			{"La cantera de Jagua",                             "Anaga"},
@@ -283,7 +283,7 @@ public class Noticia {
 			{"Hubble",        "Internacional"},
 			{"Vía Láctea",             "Internacional"}
 			
-	};
+	};*/
 	
 	Date extraerFecha (String in) throws ParseException {
 		String out;

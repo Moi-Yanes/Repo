@@ -34,9 +34,8 @@ then
 fi
 
 
+
 cd /var/www/html/TFG/php/
-
-
 echo "\n************************* EJECUTANDO CODIGO PHP *************************"
 	php main.php
 
